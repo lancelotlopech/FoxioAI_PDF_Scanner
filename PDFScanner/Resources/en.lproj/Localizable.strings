@@ -1,0 +1,182 @@
+/* Dashboard */
+"FoxioAI" = "FoxioAI";
+"PDF Assistant" = "PDF Assistant";
+"Pro" = "Pro";
+"Good Morning" = "Good Morning";
+"Good Afternoon" = "Good Afternoon";
+"Good Evening" = "Good Evening";
+"Smart Scan" = "Smart Scan";
+"AI-Powered Capture" = "AI-Powered Capture";
+"Tools" = "Tools";
+"Import Photos" = "Import Photos";
+"Import Files" = "Import Files";
+"Edit Text" = "Edit Text";
+"Sign PDF" = "Sign PDF";
+"Organize Pages" = "Organize Pages";
+"Merge PDFs" = "Merge PDFs";
+"Extract Text" = "Extract Text";
+"Protect PDF" = "Protect PDF";
+"Unlock PDF" = "Unlock PDF";
+"Security Scan" = "Security Scan";
+"Recent Files" = "Recent Files";
+"See All" = "See All";
+"No Recent Files" = "No Recent Files";
+"Import File" = "Import File";
+"Cancel" = "Cancel";
+"Extract Text From" = "Extract Text From";
+"Select Files to Merge" = "Select Files to Merge";
+"Select File" = "Select File";
+"Scanning failed: %@" = "Scanning failed: %@";
+"OCR Scanning failed: %@" = "OCR Scanning failed: %@";
+"Import failed: %@" = "Import failed: %@";
+"Error" = "Error";
+"OK" = "OK";
+"An unknown error occurred." = "An unknown error occurred.";
+"Could not extract images from file for OCR." = "Could not extract images from file for OCR.";
+"Failed to save PDF file." = "Failed to save PDF file.";
+"Failed to convert document." = "Failed to convert document.";
+"Failed to merge PDFs." = "Failed to merge PDFs.";
+"Could not extract images from PDF." = "Could not extract images from PDF.";
+"Failed to encrypt PDF." = "Failed to encrypt PDF.";
+"This file is not encrypted." = "This file is not encrypted.";
+"Incorrect password or failed to decrypt." = "Incorrect password or failed to decrypt.";
+"Failed to create PDF from images." = "Failed to create PDF from images.";
+"No text recognized." = "No text recognized.";
+
+/* Import Types */
+"PDF Document" = "PDF Document";
+"Word Document" = "Word Document";
+"Excel Spreadsheet" = "Excel Spreadsheet";
+"PowerPoint" = "PowerPoint";
+"Other Files" = "Other Files";
+
+/* OCR Sources */
+"Camera Scan" = "Camera Scan";
+"Photos" = "Photos";
+"Files" = "Files";
+"App Documents" = "App Documents";
+
+/* Password Sheet */
+"Password" = "Password";
+"Confirm Password" = "Confirm Password";
+"Set Password" = "Set Password";
+"Enter Password" = "Enter Password";
+"Confirm" = "Confirm";
+"Password cannot be empty" = "Password cannot be empty";
+"Passwords do not match" = "Passwords do not match";
+
+/* Settings */
+"Support" = "Support";
+"Give Feedback" = "Give Feedback";
+"Coming Soon" = "Coming Soon";
+"About" = "About";
+"Privacy Policy" = "Privacy Policy";
+"Privacy Policy Placeholder" = "Privacy Policy Placeholder";
+"Terms of Use" = "Terms of Use";
+"Terms of Use Placeholder" = "Terms of Use Placeholder";
+"Version" = "Version";
+"Mine" = "Mine";
+
+/* Main Tab */
+"Home" = "Home";
+"My Files" = "My Files";
+
+/* Files View */
+"No Documents" = "No Documents";
+"Scanned documents will appear here." = "Scanned documents will appear here.";
+"Rename Document" = "Rename Document";
+"New Name" = "New Name";
+"Rename" = "Rename";
+"Delete Document" = "Delete Document";
+"Delete" = "Delete";
+"Are you sure you want to delete %d items? This action cannot be undone." = "Are you sure you want to delete %d items? This action cannot be undone.";
+"Are you sure you want to delete '%@'? This action cannot be undone." = "Are you sure you want to delete '%@'? This action cannot be undone.";
+"Search files" = "Search files";
+"%d Selected" = "%d Selected";
+"Merge" = "Merge";
+"Done" = "Done";
+"Select" = "Select";
+"Merged %@" = "Merged %@";
+
+/* Subscription View */
+"Restore" = "Restore";
+"Unlimited Access" = "Unlimited Access";
+"Unlimited Scans & Exports" = "Unlimited Scans & Exports";
+"Text Recognition (OCR)" = "Text Recognition (OCR)";
+"Sign & Protect Documents" = "Sign & Protect Documents";
+"Remove All Ads" = "Remove All Ads";
+"Free Trial Enabled" = "Free Trial Enabled";
+"Not sure yet? Enable free trial" = "Not sure yet? Enable free trial";
+"YEARLY ACCESS" = "YEARLY ACCESS";
+"$39.99/year" = "$39.99/year";
+"Just $0.76 per week" = "Just $0.76 per week";
+"Save 80%" = "Save 80%";
+"WEEKLY ACCESS" = "WEEKLY ACCESS";
+"$6.99/week" = "$6.99/week";
+"3 Days Free Trial" = "3 Days Free Trial";
+"Popular" = "Popular";
+"You can cancel anytime." = "You can cancel anytime.";
+"Start Free Trial" = "Start Free Trial";
+"Continue" = "Continue";
+"Terms of Usage" = "Terms of Usage";
+
+/* Missing Strings */
+"Close" = "Close";
+"Exit" = "Exit";
+"Save" = "Save";
+"Clear" = "Clear";
+"Page Manager" = "Page Manager";
+"No pages found" = "No pages found";
+"Add Page" = "Add Page";
+"Page %d" = "Page %d";
+"Extracted Text" = "Extracted Text";
+"Could not extract any text from the scanned document." = "Could not extract any text from the scanned document.";
+"Scan or import documents first." = "Scan or import documents first.";
+"Signature" = "Signature";
+"Sign above" = "Sign above";
+"Place Signature" = "Place Signature";
+"Single finger to drag and move" = "Single finger to drag and move";
+"Pinch with two fingers to zoom" = "Pinch with two fingers to zoom";
+"Loading Resources..." = "Loading Resources...";
+"Scanning Document..." = "Scanning Document...";
+"Security Score: %d/100" = "Security Score: %d/100";
+"Security Checks" = "Security Checks";
+"Threats Found" = "Threats Found";
+"Scan Details" = "Scan Details";
+"Recommendations" = "Recommendations";
+"This document contains active content (scripts or actions). Only open it if you trust the source completely. Consider converting it to images to neutralize threats." = "This document contains active content (scripts or actions). Only open it if you trust the source completely. Consider converting it to images to neutralize threats.";
+"Size" = "Size";
+"Space" = "Space";
+"Changes saved successfully." = "Changes saved successfully.";
+"You have unsaved changes. Are you sure you want to discard them?" = "You have unsaved changes. Are you sure you want to discard them?";
+"Discard" = "Discard";
+"Analyzing Document..." = "Analyzing Document...";
+"Sign Document" = "Sign Document";
+"Tap the signature icon in the top right corner to start signing." = "Tap the signature icon in the top right corner to start signing.";
+"You can scroll to the desired page before signing." = "You can scroll to the desired page before signing.";
+"Got it" = "Got it";
+"Edit Mode Guide" = "Edit Mode Guide";
+"Tap Blue Box to frame text to modify." = "Tap Blue Box to frame text to modify.";
+"Toggle background transparency." = "Toggle background transparency.";
+"Adjust font size & spacing." = "Adjust font size & spacing.";
+"Tap the blue box in the top right to frame the text you want to modify. Use the transparency toggle to see the original text underneath for alignment. Then, adjust the font size and spacing to match the original document." = "Tap the blue box in the top right to frame the text you want to modify. Use the transparency toggle to see the original text underneath for alignment. Then, adjust the font size and spacing to match the original document.";
+
+/* New Additions */
+"Share PDF" = "Share PDF";
+"Print" = "Print";
+"Export as Images" = "Export as Images";
+"Saved" = "Saved";
+"Discard Changes?" = "Discard Changes?";
+"Initializing..." = "Initializing...";
+"Checking file integrity..." = "Checking file integrity...";
+"Analyzing encryption..." = "Analyzing encryption...";
+"Scanning for malicious scripts..." = "Scanning for malicious scripts...";
+"Verifying metadata..." = "Verifying metadata...";
+"Document is Safe" = "Document is Safe";
+"Potential Risks Found" = "Potential Risks Found";
+"Malicious Scripts" = "Malicious Scripts";
+"Auto-Run Actions" = "Auto-Run Actions";
+"Launch Commands" = "Launch Commands";
+"File Integrity" = "File Integrity";
+"Safe" = "Safe";
+"Risk" = "Risk";

@@ -1,0 +1,3 @@
+"NSCameraUsageDescription" = "Wir benötigen Zugriff auf die Kamera, um Dokumente zu scannen.";
+"NSPhotoLibraryAddUsageDescription" = "Wir benötigen die Erlaubnis, exportierte Bilder in Ihrer Fotogalerie zu speichern.";
+"NSUserTrackingUsageDescription" = "Diese Kennung wird verwendet, um Ihnen personalisierte Werbung bereitzustellen.";

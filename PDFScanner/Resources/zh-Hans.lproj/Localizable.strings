@@ -1,0 +1,182 @@
+/* Dashboard */
+"FoxioAI" = "FoxioAI";
+"PDF Assistant" = "PDF 助手";
+"Pro" = "专业版";
+"Good Morning" = "早上好";
+"Good Afternoon" = "下午好";
+"Good Evening" = "晚上好";
+"Smart Scan" = "智能扫描";
+"AI-Powered Capture" = "AI 智能捕获";
+"Tools" = "工具";
+"Import Photos" = "导入照片";
+"Import Files" = "导入文件";
+"Edit Text" = "编辑文本";
+"Sign PDF" = "签署 PDF";
+"Organize Pages" = "管理页面";
+"Merge PDFs" = "合并 PDF";
+"Extract Text" = "提取文本";
+"Protect PDF" = "加密 PDF";
+"Unlock PDF" = "解密 PDF";
+"Security Scan" = "安全扫描";
+"Recent Files" = "最近文件";
+"See All" = "查看全部";
+"No Recent Files" = "暂无最近文件";
+"Import File" = "导入文件";
+"Cancel" = "取消";
+"Extract Text From" = "提取文本来源";
+"Select Files to Merge" = "选择要合并的文件";
+"Select File" = "选择文件";
+"Scanning failed: %@" = "扫描失败: %@";
+"OCR Scanning failed: %@" = "OCR 扫描失败: %@";
+"Import failed: %@" = "导入失败: %@";
+"Error" = "错误";
+"OK" = "确定";
+"An unknown error occurred." = "发生了未知错误。";
+"Could not extract images from file for OCR." = "无法从文件中提取图像进行 OCR。";
+"Failed to save PDF file." = "保存 PDF 文件失败。";
+"Failed to convert document." = "转换文档失败。";
+"Failed to merge PDFs." = "合并 PDF 失败。";
+"Could not extract images from PDF." = "无法从 PDF 中提取图像。";
+"Failed to encrypt PDF." = "加密 PDF 失败。";
+"This file is not encrypted." = "此文件未加密。";
+"Incorrect password or failed to decrypt." = "密码错误或解密失败。";
+"Failed to create PDF from images." = "无法从图像创建 PDF。";
+"No text recognized." = "未识别到文本。";
+
+/* Import Types */
+"PDF Document" = "PDF 文档";
+"Word Document" = "Word 文档";
+"Excel Spreadsheet" = "Excel 表格";
+"PowerPoint" = "PPT 演示文稿";
+"Other Files" = "其他文件";
+
+/* OCR Sources */
+"Camera Scan" = "相机扫描";
+"Photos" = "相册照片";
+"Files" = "文件";
+"App Documents" = "应用内文档";
+
+/* Password Sheet */
+"Password" = "密码";
+"Confirm Password" = "确认密码";
+"Set Password" = "设置密码";
+"Enter Password" = "输入密码";
+"Confirm" = "确认";
+"Password cannot be empty" = "密码不能为空";
+"Passwords do not match" = "两次输入的密码不一致";
+
+/* Settings */
+"Support" = "支持";
+"Give Feedback" = "反馈建议";
+"Coming Soon" = "敬请期待";
+"About" = "关于";
+"Privacy Policy" = "隐私政策";
+"Privacy Policy Placeholder" = "隐私政策内容占位符";
+"Terms of Use" = "使用条款";
+"Terms of Use Placeholder" = "使用条款内容占位符";
+"Version" = "版本";
+"Mine" = "我的";
+
+/* Main Tab */
+"Home" = "首页";
+"My Files" = "我的文件";
+
+/* Files View */
+"No Documents" = "暂无文档";
+"Scanned documents will appear here." = "扫描的文档将显示在这里。";
+"Rename Document" = "重命名文档";
+"New Name" = "新名称";
+"Rename" = "重命名";
+"Delete Document" = "删除文档";
+"Delete" = "删除";
+"Are you sure you want to delete %d items? This action cannot be undone." = "确定要删除 %d 个项目吗？此操作无法撤销。";
+"Are you sure you want to delete '%@'? This action cannot be undone." = "确定要删除“%@”吗？此操作无法撤销。";
+"Search files" = "搜索文件";
+"%d Selected" = "已选择 %d 项";
+"Merge" = "合并";
+"Done" = "完成";
+"Select" = "选择";
+"Merged %@" = "合并于 %@";
+
+/* Subscription View */
+"Restore" = "恢复购买";
+"Unlimited Access" = "无限访问权限";
+"Unlimited Scans & Exports" = "无限扫描与导出";
+"Text Recognition (OCR)" = "文本识别 (OCR)";
+"Sign & Protect Documents" = "签署与保护文档";
+"Remove All Ads" = "移除所有广告";
+"Free Trial Enabled" = "已开启免费试用";
+"Not sure yet? Enable free trial" = "还不确定？开启免费试用";
+"YEARLY ACCESS" = "年度会员";
+"$39.99/year" = "¥298.00/年";
+"Just $0.76 per week" = "仅需 ¥5.70/周";
+"Save 80%" = "节省 80%";
+"WEEKLY ACCESS" = "周会员";
+"$6.99/week" = "¥48.00/周";
+"3 Days Free Trial" = "3 天免费试用";
+"Popular" = "最受欢迎";
+"You can cancel anytime." = "您可以随时取消订阅。";
+"Start Free Trial" = "开始免费试用";
+"Continue" = "继续";
+"Terms of Usage" = "使用条款";
+
+/* Missing Strings */
+"Close" = "关闭";
+"Exit" = "退出";
+"Save" = "保存";
+"Clear" = "清除";
+"Page Manager" = "页面管理";
+"No pages found" = "未找到页面";
+"Add Page" = "添加页面";
+"Page %d" = "第 %d 页";
+"Extracted Text" = "提取的文本";
+"Could not extract any text from the scanned document." = "无法从扫描文档中提取任何文本。";
+"Scan or import documents first." = "请先扫描或导入文档。";
+"Signature" = "签名";
+"Sign above" = "在上方签名";
+"Place Signature" = "放置签名";
+"Single finger to drag and move" = "单指拖动移动";
+"Pinch with two fingers to zoom" = "双指捏合缩放";
+"Loading Resources..." = "正在加载资源...";
+"Scanning Document..." = "正在扫描文档...";
+"Security Score: %d/100" = "安全评分: %d/100";
+"Security Checks" = "安全检查";
+"Threats Found" = "发现威胁";
+"Scan Details" = "扫描详情";
+"Recommendations" = "建议";
+"This document contains active content (scripts or actions). Only open it if you trust the source completely. Consider converting it to images to neutralize threats." = "此文档包含活动内容（脚本或操作）。仅在完全信任来源的情况下打开。建议将其转换为图像以消除威胁。";
+"Size" = "大小";
+"Space" = "间距";
+"Changes saved successfully." = "更改已成功保存。";
+"You have unsaved changes. Are you sure you want to discard them?" = "您有未保存的更改。确定要放弃吗？";
+"Discard" = "放弃";
+"Analyzing Document..." = "正在分析文档...";
+"Sign Document" = "签署文档";
+"Tap the signature icon in the top right corner to start signing." = "点击右上角的签名图标开始签署。";
+"You can scroll to the desired page before signing." = "签署前您可以滚动到目标页面。";
+"Got it" = "知道了";
+"Edit Mode Guide" = "编辑模式指南";
+"Tap Blue Box to frame text to modify." = "点击蓝色框选中文本进行修改。";
+"Toggle background transparency." = "切换背景透明度。";
+"Adjust font size & spacing." = "调整字体大小和间距。";
+"Tap the blue box in the top right to frame the text you want to modify. Use the transparency toggle to see the original text underneath for alignment. Then, adjust the font size and spacing to match the original document." = "点击右上角的蓝色框选中文本进行修改。使用透明度开关查看底层的原始文本以便对齐。然后，调整字体大小和间距以匹配原始文档。";
+
+/* New Additions */
+"Share PDF" = "分享 PDF";
+"Print" = "打印";
+"Export as Images" = "导出为图片";
+"Saved" = "已保存";
+"Discard Changes?" = "放弃更改？";
+"Initializing..." = "正在初始化...";
+"Checking file integrity..." = "正在检查文件完整性...";
+"Analyzing encryption..." = "正在分析加密...";
+"Scanning for malicious scripts..." = "正在扫描恶意脚本...";
+"Verifying metadata..." = "正在验证元数据...";
+"Document is Safe" = "文档安全";
+"Potential Risks Found" = "发现潜在风险";
+"Malicious Scripts" = "恶意脚本";
+"Auto-Run Actions" = "自动运行操作";
+"Launch Commands" = "启动命令";
+"File Integrity" = "文件完整性";
+"Safe" = "安全";
+"Risk" = "风险";

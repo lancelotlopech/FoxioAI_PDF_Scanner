@@ -1,0 +1,3 @@
+"NSCameraUsageDescription" = "我们需要访问相机以扫描文档。";
+"NSPhotoLibraryAddUsageDescription" = "我们需要权限将导出的图像保存到您的相册。";
+"NSUserTrackingUsageDescription" = "此标识符将用于向您提供个性化广告。";

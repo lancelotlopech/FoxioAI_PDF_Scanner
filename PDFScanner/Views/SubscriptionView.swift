@@ -1,0 +1,402 @@
+import SwiftUI
+
+struct SubscriptionView: View {
+    @Environment(\.dismiss) var dismiss
+    @StateObject private var subManager = SubscriptionManager.shared
+    @State private var selectedProductID: String = SubscriptionManager.mockYearly.id // Default to Yearly
+    @State private var isTrialEnabled: Bool = false
+    
+    // Theme Color (Deep Red, Solid)
+    private let brandColor = Color(red: 0.85, green: 0.1, blue: 0.1)
+    
+    // Mock Products
+    let weekly = SubscriptionManager.mockWeekly
+    let yearly = SubscriptionManager.mockYearly
+    
+    var body: some View {
+        ZStack {
+            Color(uiColor: .systemGroupedBackground)
+                .ignoresSafeArea()
+            
+            VStack(spacing: 0) {
+                // 1. Header
+                headerView
+                    .padding(.horizontal)
+                    .padding(.vertical, 8)
+                
+                // Adaptive Content Area
+                // ViewThatFits (iOS 16+) automatically picks the first view that fits.
+                // If the Fixed Layout (VStack with Spacers) fits, it uses that (One Screen Experience).
+                // If it doesn't fit (Small Screen), it falls back to the ScrollView layout.
+                ViewThatFits(in: .vertical) {
+                    // Option A: Fixed One-Screen Layout
+                    fixedContentLayout
+                    
+                    // Option B: Scrollable Layout (Fallback for SE/Small screens)
+                    scrollableContentLayout
+                }
+                
+                // 7. Bottom Button (Always Sticky)
+                bottomSection
+            }
+        }
+        .onChange(of: isTrialEnabled) { oldValue, newValue in
+            // Logic 1: If Free Trial is enabled -> Auto switch to Weekly plan
+            if newValue {
+                 selectedProductID = weekly.id
+            }
+        }
+        .onChange(of: selectedProductID) { oldValue, newValue in
+            // Logic 2: If User switches to Yearly -> Auto turn off Free Trial
+            if newValue == yearly.id {
+                isTrialEnabled = false
+            }
+        }
+    }
+    
+    // MARK: - Layout Variants
+    
+    private var fixedContentLayout: some View {
+        VStack(spacing: 0) {
+            Spacer(minLength: 2)
+            heroSection
+            Spacer(minLength: 2)
+            featuresList.padding(.horizontal, 32)
+            Spacer(minLength: 4)
+            trialToggleSection.padding(.horizontal, 20)
+            Spacer(minLength: 4)
+            pricingSection.padding(.horizontal, 20)
+            Spacer(minLength: 4)
+            assuranceSection
+            Spacer(minLength: 8)
+        }
+    }
+    
+    private var scrollableContentLayout: some View {
+        ScrollView {
+            VStack(spacing: 12) {
+                heroSection
+                    .padding(.top, 10)
+                featuresList
+                    .padding(.horizontal, 32)
+                trialToggleSection
+                    .padding(.horizontal, 20)
+                pricingSection
+                    .padding(.horizontal, 20)
+                assuranceSection
+                
+                Spacer(minLength: 20)
+            }
+            .padding(.bottom, 20)
+        }
+    }
+    
+    // MARK: - Components
+    
+    private var headerView: some View {
+        HStack {
+            Button {
+                dismiss()
+            } label: {
+                Image(systemName: "xmark.circle.fill")
+                    .font(.system(size: 28))
+                    .foregroundStyle(.gray.opacity(0.5))
+            }
+            
+            Spacer()
+            
+            Button("Restore") {
+                Task {
+                    await subManager.restorePurchases()
+                }
+            }
+            .font(.caption.weight(.medium))
+            .foregroundStyle(.secondary)
+        }
+    }
+    
+    private var heroSection: some View {
+        VStack(spacing: 4) {
+            // Complex Tech Hero Graphic (Scaled Down)
+            ZStack {
+                // Outer Glow
+                Circle()
+                    .fill(brandColor.opacity(0.05))
+                    .frame(width: 100, height: 100)
+                    .blur(radius: 10)
+                
+                // Outer Ring
+                Circle()
+                    .stroke(brandColor.opacity(0.2), lineWidth: 1)
+                    .frame(width: 90, height: 90)
+                
+                // Middle Dashed Ring
+                Circle()
+                    .stroke(brandColor.opacity(0.3), style: StrokeStyle(lineWidth: 1.5, dash: [6, 6]))
+                    .frame(width: 76, height: 76)
+                
+                // Inner Background
+                Circle()
+                    .fill(brandColor.opacity(0.1))
+                    .frame(width: 60, height: 60)
+                
+                // Main Icon
+                Image(systemName: "doc.viewfinder.fill")
+                    .font(.system(size: 28))
+                    .foregroundStyle(brandColor)
+                    .shadow(color: brandColor.opacity(0.3), radius: 6, y: 3)
+                
+                // Satellite Icons (Scaled Down)
+                Group {
+                    // Lock
+                    Circle()
+                        .fill(Color(uiColor: .systemBackground))
+                        .frame(width: 20, height: 20)
+                        .shadow(radius: 2)
+                        .overlay(
+                            Image(systemName: "lock.fill")
+                                .foregroundStyle(.red)
+                                .font(.system(size: 10, weight: .bold))
+                        )
+                        .offset(x: 28, y: -24)
+                    
+                    // Signature
+                    Circle()
+                        .fill(Color(uiColor: .systemBackground))
+                        .frame(width: 20, height: 20)
+                        .shadow(radius: 2)
+                        .overlay(
+                            Image(systemName: "signature")
+                                .foregroundStyle(.purple)
+                                .font(.system(size: 10, weight: .bold))
+                        )
+                        .offset(x: -28, y: 20)
+                        
+                    // Cloud/Sync
+                    Circle()
+                        .fill(Color(uiColor: .systemBackground))
+                        .frame(width: 16, height: 16)
+                        .shadow(radius: 2)
+                        .overlay(
+                            Image(systemName: "icloud.fill")
+                                .foregroundStyle(.blue)
+                                .font(.system(size: 8, weight: .bold))
+                        )
+                        .offset(x: 32, y: 12)
+                }
+            }
+            .padding(.bottom, 2)
+            
+            Text("Unlimited Access")
+                .font(.system(size: 20, weight: .heavy, design: .rounded))
+                .multilineTextAlignment(.center)
+                .foregroundStyle(.primary)
+                .padding(.horizontal)
+        }
+    }
+    
+    private var featuresList: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            FeatureRow(text: "Unlimited Scans & Exports", color: brandColor)
+            FeatureRow(text: "Text Recognition (OCR)", color: brandColor)
+            FeatureRow(text: "Sign & Protect Documents", color: brandColor)
+            FeatureRow(text: "Remove All Ads", color: brandColor)
+        }
+        .frame(maxWidth: .infinity) // Center the block
+    }
+    
+    private var trialToggleSection: some View {
+        HStack {
+            Text(isTrialEnabled ? String(localized: "Free Trial Enabled") : String(localized: "Not sure yet? Enable free trial"))
+                .font(.subheadline.bold())
+                .foregroundStyle(isTrialEnabled ? brandColor : .secondary)
+            
+            Spacer()
+            
+            Toggle("", isOn: $isTrialEnabled)
+                .labelsHidden()
+                .tint(brandColor)
+        }
+        .padding(10)
+        .background(isTrialEnabled ? brandColor.opacity(0.1) : Color(uiColor: .secondarySystemBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(isTrialEnabled ? brandColor.opacity(0.3) : Color.gray.opacity(0.2), lineWidth: 1)
+        )
+    }
+    
+    private var pricingSection: some View {
+        VStack(spacing: 8) {
+            // Yearly Option
+            PricingCardNew(
+                title: "YEARLY ACCESS",
+                price: "$39.99/year",
+                subtitle: "Just $0.76 per week",
+                badge: "Save 80%",
+                isSelected: selectedProductID == yearly.id,
+                brandColor: brandColor,
+                onTap: { selectedProductID = yearly.id }
+            )
+            
+            // Weekly Option
+            PricingCardNew(
+                title: "WEEKLY ACCESS",
+                price: "$6.99/week",
+                subtitle: isTrialEnabled ? "3 Days Free Trial" : nil,
+                badge: isTrialEnabled ? "Popular" : nil,
+                isSelected: selectedProductID == weekly.id,
+                brandColor: brandColor,
+                onTap: { selectedProductID = weekly.id }
+            )
+        }
+    }
+    
+    private var assuranceSection: some View {
+        HStack(spacing: 6) {
+            Image(systemName: "checkmark.shield.fill")
+                .foregroundStyle(.green)
+                .font(.caption)
+            Text("You can cancel anytime.")
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+        }
+    }
+    
+    private var bottomSection: some View {
+        VStack(spacing: 8) {
+            Button {
+                print("Purchase \(selectedProductID)")
+            } label: {
+                Text(LocalizedStringKey(buttonText))
+                    .font(.headline.bold())
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 48)
+                    .background(brandColor) // Solid Color
+                    .clipShape(RoundedRectangle(cornerRadius: 24))
+                    .shadow(color: brandColor.opacity(0.3), radius: 8, y: 4)
+            }
+            
+            HStack(spacing: 20) {
+                Button("Terms of Usage") {
+                    // Action for Terms
+                }
+                
+                Button("Privacy Policy") {
+                    // Action for Privacy
+                }
+            }
+            .font(.caption2)
+            .foregroundStyle(.secondary)
+            .buttonStyle(.plain) // Ensure they look like text but clickable
+            .padding(.top, 2)
+        }
+        .padding(.horizontal, 20)
+        .padding(.bottom, 20) // Increased bottom padding for safety
+    }
+    
+    private var buttonText: String {
+        if isTrialEnabled {
+            return "Start Free Trial"
+        } else {
+            return "Continue"
+        }
+    }
+}
+
+// MARK: - Subviews
+
+struct FeatureRow: View {
+    let text: LocalizedStringKey
+    let color: Color
+    
+    var body: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "checkmark.circle.fill")
+                .font(.system(size: 14, weight: .bold)) // Smaller
+                .foregroundStyle(color)
+            
+            Text(text)
+                .font(.footnote) // Smaller
+                .foregroundStyle(.primary)
+        }
+    }
+}
+
+struct PricingCardNew: View {
+    let title: LocalizedStringKey
+    let price: LocalizedStringKey
+    let subtitle: String?
+    let badge: String?
+    let isSelected: Bool
+    let brandColor: Color
+    let onTap: () -> Void
+    
+    var body: some View {
+        Button(action: onTap) {
+            ZStack(alignment: .topTrailing) {
+                HStack {
+                    // Radio Circle
+                    Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                        .font(.title3)
+                        .foregroundStyle(isSelected ? brandColor : .gray.opacity(0.5))
+                    
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(title)
+                            .font(.subheadline.bold())
+                            .foregroundStyle(.primary)
+                        
+                        if let subtitle = subtitle {
+                            Text(LocalizedStringKey(subtitle))
+                                .font(.caption2)
+                                .foregroundStyle(isSelected ? brandColor : .secondary)
+                                .fontWeight(isSelected ? .medium : .regular)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                    }
+                    
+                    Spacer()
+                    
+                    Text(price)
+                        .font(.subheadline)
+                        .foregroundStyle(.primary)
+                }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 10) // Slightly more padding for touch target
+                .frame(minHeight: 50)
+                .background(Color(uiColor: .secondarySystemGroupedBackground))
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(isSelected ? brandColor : Color.clear, lineWidth: 2)
+                )
+                
+                if let badge = badge {
+                    Text(LocalizedStringKey(badge))
+                        .font(.system(size: 9, weight: .bold))
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 3)
+                        .background(
+                            LinearGradient(
+                                colors: [.orange, .pink],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .clipShape(Capsule())
+                        .shadow(color: .orange.opacity(0.3), radius: 2, x: 0, y: 1)
+                        .offset(x: 8, y: -8)
+                }
+            }
+        }
+        .buttonStyle(.plain)
+        .padding(.top, 6)
+        .padding(.trailing, 6)
+    }
+}
+
+#Preview {
+    SubscriptionView()
+}

@@ -1,0 +1,182 @@
+/* Dashboard */
+"FoxioAI" = "FoxioAI";
+"PDF Assistant" = "PDF-Assistent";
+"Pro" = "Pro";
+"Good Morning" = "Guten Morgen";
+"Good Afternoon" = "Guten Tag";
+"Good Evening" = "Guten Abend";
+"Smart Scan" = "Smart Scan";
+"AI-Powered Capture" = "KI-gestützte Erfassung";
+"Tools" = "Werkzeuge";
+"Import Photos" = "Fotos importieren";
+"Import Files" = "Dateien importieren";
+"Edit Text" = "Text bearbeiten";
+"Sign PDF" = "PDF unterschreiben";
+"Organize Pages" = "Seiten organisieren";
+"Merge PDFs" = "PDFs zusammenführen";
+"Extract Text" = "Text extrahieren";
+"Protect PDF" = "PDF schützen";
+"Unlock PDF" = "PDF entsperren";
+"Security Scan" = "Sicherheitsscan";
+"Recent Files" = "Zuletzt verwendet";
+"See All" = "Alle anzeigen";
+"No Recent Files" = "Keine aktuellen Dateien";
+"Import File" = "Datei importieren";
+"Cancel" = "Abbrechen";
+"Extract Text From" = "Text extrahieren aus";
+"Select Files to Merge" = "Dateien zum Zusammenführen auswählen";
+"Select File" = "Datei auswählen";
+"Scanning failed: %@" = "Scannen fehlgeschlagen: %@";
+"OCR Scanning failed: %@" = "OCR-Scan fehlgeschlagen: %@";
+"Import failed: %@" = "Import fehlgeschlagen: %@";
+"Error" = "Fehler";
+"OK" = "OK";
+"An unknown error occurred." = "Ein unbekannter Fehler ist aufgetreten.";
+"Could not extract images from file for OCR." = "Bilder konnten nicht für OCR extrahiert werden.";
+"Failed to save PDF file." = "PDF-Datei konnte nicht gespeichert werden.";
+"Failed to convert document." = "Dokument konnte nicht konvertiert werden.";
+"Failed to merge PDFs." = "PDFs konnten nicht zusammengeführt werden.";
+"Could not extract images from PDF." = "Bilder konnten nicht aus PDF extrahiert werden.";
+"Failed to encrypt PDF." = "PDF konnte nicht verschlüsselt werden.";
+"This file is not encrypted." = "Diese Datei ist nicht verschlüsselt.";
+"Incorrect password or failed to decrypt." = "Falsches Passwort oder Entschlüsselung fehlgeschlagen.";
+"Failed to create PDF from images." = "PDF konnte nicht aus Bildern erstellt werden.";
+"No text recognized." = "Kein Text erkannt.";
+
+/* Import Types */
+"PDF Document" = "PDF-Dokument";
+"Word Document" = "Word-Dokument";
+"Excel Spreadsheet" = "Excel-Tabelle";
+"PowerPoint" = "PowerPoint";
+"Other Files" = "Andere Dateien";
+
+/* OCR Sources */
+"Camera Scan" = "Kamera-Scan";
+"Photos" = "Fotos";
+"Files" = "Dateien";
+"App Documents" = "App-Dokumente";
+
+/* Password Sheet */
+"Password" = "Passwort";
+"Confirm Password" = "Passwort bestätigen";
+"Set Password" = "Passwort festlegen";
+"Enter Password" = "Passwort eingeben";
+"Confirm" = "Bestätigen";
+"Password cannot be empty" = "Passwort darf nicht leer sein";
+"Passwords do not match" = "Passwörter stimmen nicht überein";
+
+/* Settings */
+"Support" = "Support";
+"Give Feedback" = "Feedback geben";
+"Coming Soon" = "Demnächst";
+"About" = "Über";
+"Privacy Policy" = "Datenschutzerklärung";
+"Privacy Policy Placeholder" = "Inhalt der Datenschutzerklärung";
+"Terms of Use" = "Nutzungsbedingungen";
+"Terms of Use Placeholder" = "Inhalt der Nutzungsbedingungen";
+"Version" = "Version";
+"Mine" = "Ich";
+
+/* Main Tab */
+"Home" = "Start";
+"My Files" = "Meine Dateien";
+
+/* Files View */
+"No Documents" = "Keine Dokumente";
+"Scanned documents will appear here." = "Gescannte Dokumente erscheinen hier.";
+"Rename Document" = "Dokument umbenennen";
+"New Name" = "Neuer Name";
+"Rename" = "Umbenennen";
+"Delete Document" = "Dokument löschen";
+"Delete" = "Löschen";
+"Are you sure you want to delete %d items? This action cannot be undone." = "Möchten Sie %d Elemente wirklich löschen? Dies kann nicht rückgängig gemacht werden.";
+"Are you sure you want to delete '%@'? This action cannot be undone." = "Möchten Sie '%@' wirklich löschen? Dies kann nicht rückgängig gemacht werden.";
+"Search files" = "Dateien suchen";
+"%d Selected" = "%d ausgewählt";
+"Merge" = "Zusammenführen";
+"Done" = "Fertig";
+"Select" = "Auswählen";
+"Merged %@" = "Zusammengeführt %@";
+
+/* Subscription View */
+"Restore" = "Wiederherstellen";
+"Unlimited Access" = "Unbegrenzter Zugriff";
+"Unlimited Scans & Exports" = "Unbegrenzte Scans & Exporte";
+"Text Recognition (OCR)" = "Texterkennung (OCR)";
+"Sign & Protect Documents" = "Dokumente unterschreiben & schützen";
+"Remove All Ads" = "Werbung entfernen";
+"Free Trial Enabled" = "Kostenlose Testversion aktiviert";
+"Not sure yet? Enable free trial" = "Unsicher? Testversion aktivieren";
+"YEARLY ACCESS" = "JÄHRLICHER ZUGANG";
+"$39.99/year" = "39,99 €/Jahr";
+"Just $0.76 per week" = "Nur 0,76 €/Woche";
+"Save 80%" = "Sparen Sie 80%";
+"WEEKLY ACCESS" = "WÖCHENTLICHER ZUGANG";
+"$6.99/week" = "6,99 €/Woche";
+"3 Days Free Trial" = "3 Tage kostenlos testen";
+"Popular" = "Beliebt";
+"You can cancel anytime." = "Sie können jederzeit kündigen.";
+"Start Free Trial" = "Testversion starten";
+"Continue" = "Weiter";
+"Terms of Usage" = "Nutzungsbedingungen";
+
+/* Missing Strings */
+"Close" = "Schließen";
+"Exit" = "Beenden";
+"Save" = "Speichern";
+"Clear" = "Löschen";
+"Page Manager" = "Seitenmanager";
+"No pages found" = "Keine Seiten gefunden";
+"Add Page" = "Seite hinzufügen";
+"Page %d" = "Seite %d";
+"Extracted Text" = "Extrahierter Text";
+"Could not extract any text from the scanned document." = "Kein Text aus dem gescannten Dokument extrahiert.";
+"Scan or import documents first." = "Zuerst Dokumente scannen oder importieren.";
+"Signature" = "Unterschrift";
+"Sign above" = "Hier unterschreiben";
+"Place Signature" = "Unterschrift platzieren";
+"Single finger to drag and move" = "Mit einem Finger ziehen und bewegen";
+"Pinch with two fingers to zoom" = "Mit zwei Fingern zoomen";
+"Loading Resources..." = "Ressourcen werden geladen...";
+"Scanning Document..." = "Dokument wird gescannt...";
+"Security Score: %d/100" = "Sicherheitsbewertung: %d/100";
+"Security Checks" = "Sicherheitsprüfungen";
+"Threats Found" = "Bedrohungen gefunden";
+"Scan Details" = "Scan-Details";
+"Recommendations" = "Empfehlungen";
+"This document contains active content (scripts or actions). Only open it if you trust the source completely. Consider converting it to images to neutralize threats." = "Dieses Dokument enthält aktive Inhalte (Skripte oder Aktionen). Öffnen Sie es nur, wenn Sie der Quelle vertrauen. Erwägen Sie die Konvertierung in Bilder, um Bedrohungen zu neutralisieren.";
+"Size" = "Größe";
+"Space" = "Abstand";
+"Changes saved successfully." = "Änderungen erfolgreich gespeichert.";
+"You have unsaved changes. Are you sure you want to discard them?" = "Sie haben ungespeicherte Änderungen. Möchten Sie diese wirklich verwerfen?";
+"Discard" = "Verwerfen";
+"Analyzing Document..." = "Dokument wird analysiert...";
+"Sign Document" = "Dokument unterschreiben";
+"Tap the signature icon in the top right corner to start signing." = "Tippen Sie auf das Unterschriftssymbol oben rechts, um zu unterschreiben.";
+"You can scroll to the desired page before signing." = "Sie können vor dem Unterschreiben zur gewünschten Seite scrollen.";
+"Got it" = "Verstanden";
+"Edit Mode Guide" = "Bearbeitungsmodus-Anleitung";
+"Tap Blue Box to frame text to modify." = "Tippen Sie auf das blaue Feld, um Text zu bearbeiten.";
+"Toggle background transparency." = "Hintergrundtransparenz umschalten.";
+"Adjust font size & spacing." = "Schriftgröße & Abstand anpassen.";
+"Tap the blue box in the top right to frame the text you want to modify. Use the transparency toggle to see the original text underneath for alignment. Then, adjust the font size and spacing to match the original document." = "Tippen Sie auf das blaue Feld oben rechts, um den Text zu bearbeiten. Nutzen Sie die Transparenz, um den Originaltext zur Ausrichtung zu sehen. Passen Sie dann Schriftgröße und Abstand an das Originaldokument an.";
+
+/* New Additions */
+"Share PDF" = "PDF teilen";
+"Print" = "Drucken";
+"Export as Images" = "Als Bilder exportieren";
+"Saved" = "Gespeichert";
+"Discard Changes?" = "Änderungen verwerfen?";
+"Initializing..." = "Initialisiere...";
+"Checking file integrity..." = "Prüfe Dateiintegrität...";
+"Analyzing encryption..." = "Analysiere Verschlüsselung...";
+"Scanning for malicious scripts..." = "Suche nach bösartigen Skripten...";
+"Verifying metadata..." = "Überprüfe Metadaten...";
+"Document is Safe" = "Dokument ist sicher";
+"Potential Risks Found" = "Potenzielle Risiken gefunden";
+"Malicious Scripts" = "Bösartige Skripte";
+"Auto-Run Actions" = "Automatische Ausführungsaktionen";
+"Launch Commands" = "Startbefehle";
+"File Integrity" = "Dateiintegrität";
+"Safe" = "Sicher";
+"Risk" = "Risiko";
