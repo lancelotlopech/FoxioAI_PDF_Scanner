@@ -18,7 +18,7 @@ struct FilesView: View {
     @State private var isDeletingSelection = false
     
     // View Mode Preference (Persisted)
-    @AppStorage("isGridView") private var isGridView = false
+    @AppStorage("isGridView") private var isGridView = true // Default to Grid
     
     var filteredDocuments: [ScannedItem] {
         if searchText.isEmpty {
@@ -28,13 +28,18 @@ struct FilesView: View {
         }
     }
     
+    // 2-Column Grid
     let gridColumns = [
-        GridItem(.adaptive(minimum: 100), spacing: 16, alignment: .top)
+        GridItem(.flexible(), spacing: 16),
+        GridItem(.flexible(), spacing: 16)
     ]
     
     var body: some View {
         NavigationStack {
-            Group {
+            ZStack {
+                Color(uiColor: .systemGroupedBackground)
+                    .ignoresSafeArea()
+                
                 if store.documents.isEmpty {
                     ContentUnavailableView(
                         "No Documents",
@@ -98,7 +103,7 @@ struct FilesView: View {
             }
             .searchable(text: $searchText, prompt: "Search files")
             .navigationTitle(isSelectionMode ? String(localized: "\(selectedItems.count) Selected") : String(localized: "My Files"))
-            .navigationBarTitleDisplayMode(isSelectionMode ? .inline : .large)
+            .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 // Leading Toolbar
                 ToolbarItem(placement: .topBarLeading) {
@@ -112,7 +117,7 @@ struct FilesView: View {
                         }
                         .disabled(selectedItems.isEmpty)
                     } else {
-                        // View Toggle Button (Only when not selecting)
+                        // View Toggle Button
                         Button {
                             withAnimation {
                                 isGridView.toggle()
@@ -202,7 +207,8 @@ struct FilesView: View {
                             .foregroundStyle(selectedItems.contains(item) ? .blue : .gray)
                             .font(.title3)
                             .background(Circle().fill(.white))
-                            .offset(x: 5, y: -5)
+                            .offset(x: 8, y: -8)
+                            .shadow(radius: 2)
                     }
                 }
                 .buttonStyle(.plain)
@@ -210,13 +216,13 @@ struct FilesView: View {
                 NavigationLink(value: item) {
                     GridItemCard(item: item)
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(ScaleButtonStyle()) // Add press animation
                 .contextMenu {
                     menuActions(for: item)
                 }
             }
         }
-        .id(item.id) // Force identity to prevent layout reuse issues
+        .id(item.id)
     }
     
     @ViewBuilder
@@ -227,6 +233,12 @@ struct FilesView: View {
             isRenaming = true
         } label: {
             Label("Rename", systemImage: "pencil")
+        }
+        
+        if let url = item.url {
+            ShareLink(item: url) {
+                Label("Share", systemImage: "square.and.arrow.up")
+            }
         }
         
         Button(role: .destructive) {
@@ -300,24 +312,24 @@ struct PDFPreviewThumbnail: View {
                 Image(uiImage: thumbnail)
                     .resizable()
                     .scaledToFill()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
                 ZStack {
-                    Color.gray.opacity(0.1)
+                    Color.white
                     
                     if isLoading {
                         ProgressView()
                             .scaleEffect(0.8)
                     } else {
                         Image(systemName: "doc.text.fill")
-                            .foregroundStyle(.gray.opacity(0.5))
-                            .font(.title2)
+                            .foregroundStyle(.gray.opacity(0.3))
+                            .font(.largeTitle)
                     }
                 }
             }
         }
         .task(id: url) {
             isLoading = true
-            // Check cache first
             if let url = url, let cached = ThumbnailCache.shared.image(for: url) {
                 self.thumbnail = cached
                 isLoading = false
@@ -333,8 +345,6 @@ struct PDFPreviewThumbnail: View {
             return
         }
         
-        // Check if thumbnail is already generated or perform generation
-        // For simple list performance, we generate on task start
         guard let document = PDFDocument(url: url) else {
             isLoading = false
             return
@@ -344,16 +354,12 @@ struct PDFPreviewThumbnail: View {
             return
         }
         
-        // Calculate thumbnail size maintaining aspect ratio
-        // We use a slightly larger scale for crispness
         let thumbnailSize = CGSize(width: size.width * 2, height: size.height * 2)
         
-        // Run on background thread to avoid blocking UI
         let image = await Task.detached(priority: .userInitiated) {
             return page.thumbnail(of: thumbnailSize, for: .mediaBox)
         }.value
         
-        // Cache the image
         ThumbnailCache.shared.insert(image, for: url)
         
         await MainActor.run {
@@ -368,12 +374,14 @@ struct ItemRow: View {
     
     var body: some View {
         HStack(spacing: 12) {
-            // PDF Preview Thumbnail
             ZStack(alignment: .bottomTrailing) {
                 PDFPreviewThumbnail(url: item.url, size: CGSize(width: 40, height: 52))
                     .frame(width: 40, height: 52)
-                    .clipShape(RoundedRectangle(cornerRadius: 4))
-                    .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 1)
+                    .clipShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 6, style: .continuous)
+                            .stroke(Color.gray.opacity(0.2), lineWidth: 1)
+                    )
                 
                 if item.isLocked {
                     Image(systemName: "lock.fill")
@@ -390,7 +398,7 @@ struct ItemRow: View {
                 Text(item.name)
                     .font(.headline)
                     .lineLimit(1)
-                Text("\(item.pageCount) pages • \(item.creationDate.formatted(date: .numeric, time: .shortened))")
+                Text("\(item.pageCount) Page\(item.pageCount > 1 ? "s" : "") • \(item.creationDate.formatted(date: .numeric, time: .shortened))")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -403,50 +411,59 @@ struct GridItemCard: View {
     let item: ScannedItem
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            // Large Preview
-            // Use a base container to strictly define the cell size, then overlay the image.
-            // This prevents the image's natural size from expanding the cell and causing overlaps.
-            Color.gray.opacity(0.1)
-                .frame(height: 160)
-                .overlay {
-                    PDFPreviewThumbnail(url: item.url, size: CGSize(width: 120, height: 160))
+        VStack(alignment: .leading, spacing: 10) {
+            // Thumbnail Container
+            ZStack {
+                Color.white
+                
+                // NOTE: FIX FOR OVERLAPPING LAYOUT - DO NOT REMOVE GEOMETRY READER
+                // GeometryReader ensures the image is strictly constrained to the parent frame
+                GeometryReader { geo in
+                    PDFPreviewThumbnail(url: item.url, size: geo.size)
+                        .frame(width: geo.size.width, height: geo.size.height)
                 }
-                .clipShape(RoundedRectangle(cornerRadius: 8))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 8)
-                        .stroke(Color.gray.opacity(0.2), lineWidth: 1)
-                )
-                .overlay(alignment: .bottomTrailing) {
-                    if item.isLocked {
-                        Image(systemName: "lock.fill")
-                            .font(.system(size: 12))
-                            .foregroundStyle(.white)
-                            .padding(6)
-                            .background(Color.black.opacity(0.7))
-                            .clipShape(Circle())
-                            .padding(6)
-                    }
+            }
+            .frame(height: 180) // Fixed height for thumbnail area
+            .frame(maxWidth: .infinity)
+            .clipped() // Ensure content doesn't overflow
+            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+            .shadow(color: .black.opacity(0.08), radius: 6, x: 0, y: 3) // Nice shadow
+            .overlay(
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .stroke(Color.gray.opacity(0.1), lineWidth: 1)
+            )
+            .overlay(alignment: .topTrailing) {
+                if item.isLocked {
+                    Image(systemName: "lock.fill")
+                        .font(.caption.bold())
+                        .foregroundStyle(.white)
+                        .padding(6)
+                        .background(Material.ultraThin)
+                        .clipShape(Circle())
+                        .padding(8)
                 }
+            }
             
             // Info
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: 4) {
                 Text(item.name)
-                    .font(.subheadline.bold())
-                    .lineLimit(1)
+                    .font(.headline)
+                    .lineLimit(2) // Allow 2 lines
+                    .multilineTextAlignment(.leading)
                     .foregroundStyle(.primary)
+                    .frame(height: 44, alignment: .topLeading) // Fixed height for alignment
                 
-                Text("\(item.pageCount) pages")
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
-                
-                Text(item.creationDate.formatted(date: .numeric, time: .shortened))
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
+                HStack(spacing: 4) {
+                    Text("\(item.pageCount) Page\(item.pageCount > 1 ? "s" : "")")
+                    Text("·")
+                    Text(item.creationDate.formatted(date: .omitted, time: .shortened))
+                }
+                .font(.caption)
+                .foregroundStyle(.secondary)
             }
+            .padding(.horizontal, 4)
         }
-        .frame(maxWidth: .infinity, alignment: .top) // Ensure alignment
-        .contentShape(Rectangle()) // Better tap area
+        .contentShape(Rectangle())
     }
 }
 

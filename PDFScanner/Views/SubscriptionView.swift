@@ -279,13 +279,8 @@ struct SubscriptionView: View {
             }
             
             HStack(spacing: 20) {
-                Button("Terms of Usage") {
-                    // Action for Terms
-                }
-                
-                Button("Privacy Policy") {
-                    // Action for Privacy
-                }
+                Link("Terms of Usage", destination: URL(string: "https://termsofuspdf.moonspace.workers.dev/")!)
+                Link("Privacy Policy", destination: URL(string: "https://privacypolicypdf.moonspace.workers.dev/")!)
             }
             .font(.caption2)
             .foregroundStyle(.secondary)

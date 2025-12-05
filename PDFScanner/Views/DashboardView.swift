@@ -172,13 +172,14 @@ struct DashboardView: View {
                         // 2. Hero Scan Button
                         heroScanButton
                         
-                        // 3. Tools Grid (Bento Style)
-                        toolsGrid
+                        // 3. Tools Grid (Sectioned)
+                        toolsSection
                         
                         // 4. Recent Files (Horizontal Scroll)
                         recentFilesSection
                     }
                     .padding()
+                    .padding(.bottom, 80) // Extra padding for tab bar
                 }
                 .background(Color(uiColor: .systemGroupedBackground))
                 .navigationBarHidden(true)
@@ -337,7 +338,7 @@ struct DashboardView: View {
         HStack {
             VStack(alignment: .leading, spacing: 4) {
                 Text("FoxioAI")
-                    .font(.title2.bold())
+                    .font(.system(.title2, design: .rounded).bold())
                     .foregroundStyle(.primary)
                 Text("PDF Assistant")
                     .font(.subheadline)
@@ -348,30 +349,24 @@ struct DashboardView: View {
             Button {
                 isShowingSubscription = true
             } label: {
-                HStack(spacing: 4) {
+                HStack(spacing: 6) {
                     Image(systemName: "crown.fill")
-                        .foregroundStyle(.yellow)
+                        .foregroundStyle(LinearGradient(colors: [
+                            Color(red: 1.0, green: 0.92, blue: 0.6), // Light Gold
+                            Color(red: 1.0, green: 0.84, blue: 0.2)  // Gold
+                        ], startPoint: .topLeading, endPoint: .bottomTrailing))
                     Text("Pro")
                         .font(.subheadline.bold())
                         .foregroundStyle(.primary)
                 }
-                .padding(.horizontal, 12)
-                .padding(.vertical, 6)
-                .background(Color(uiColor: .secondarySystemGroupedBackground))
+                .padding(.horizontal, 16)
+                .padding(.vertical, 8)
+                .background(Material.ultraThin)
                 .clipShape(Capsule())
-                .shadow(color: .black.opacity(0.05), radius: 2)
+                .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
             }
         }
         .padding(.top, 8)
-    }
-    
-    private var greetingMessage: String {
-        let hour = Calendar.current.component(.hour, from: Date())
-        switch hour {
-        case 0..<12: return "Good Morning"
-        case 12..<18: return "Good Afternoon"
-        default: return "Good Evening"
-        }
     }
     
     private var heroScanButton: some View {
@@ -379,7 +374,7 @@ struct DashboardView: View {
             isShowingScanner = true
         } label: {
             HStack {
-                VStack(alignment: .leading, spacing: 6) {
+                VStack(alignment: .leading, spacing: 8) {
                     Text("Smart Scan")
                         .font(.system(size: 28, weight: .heavy, design: .rounded))
                         .foregroundStyle(.white)
@@ -393,7 +388,7 @@ struct DashboardView: View {
                 ZStack {
                     Circle()
                         .fill(.white.opacity(0.2))
-                        .frame(width: 70, height: 70)
+                        .frame(width: 72, height: 72)
                     Image(systemName: "doc.viewfinder")
                         .font(.system(size: 36, weight: .semibold))
                         .foregroundStyle(.white)
@@ -404,31 +399,40 @@ struct DashboardView: View {
             .background(
                 ZStack {
                     LinearGradient(
-                        colors: [Color(red: 1.0, green: 0.2, blue: 0.4), .orange],
+                        colors: [Color(red: 1.0, green: 0.3, blue: 0.5), Color(red: 1.0, green: 0.6, blue: 0.2)],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     )
                     
-                    // Tech Glow Effect
-                    Circle()
-                        .fill(.white.opacity(0.1))
-                        .frame(width: 200, height: 200)
-                        .offset(x: 100, y: -50)
-                        .blur(radius: 30)
+                    // Subtle Pattern
+                    Group {
+                        Circle()
+                            .fill(.white.opacity(0.1))
+                            .frame(width: 200, height: 200)
+                            .offset(x: 100, y: -50)
+                            .blur(radius: 30)
+                        
+                        Circle()
+                            .fill(.white.opacity(0.1))
+                            .frame(width: 150, height: 150)
+                            .offset(x: -100, y: 80)
+                            .blur(radius: 20)
+                    }
+                    .allowsHitTesting(false)
                 }
             )
-            .clipShape(RoundedRectangle(cornerRadius: 24))
-            .shadow(color: Color(red: 1.0, green: 0.2, blue: 0.4).opacity(0.4), radius: 15, x: 0, y: 8)
+            .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
+            .contentShape(RoundedRectangle(cornerRadius: 28, style: .continuous)) // Fix hit testing
+            .shadow(color: Color(red: 1.0, green: 0.3, blue: 0.5).opacity(0.4), radius: 16, x: 0, y: 8)
         }
+        .buttonStyle(ScaleButtonStyle())
     }
     
-    private var toolsGrid: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("Tools")
-                .font(.title3.bold())
+    private var toolsSection: some View {
+        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
             
-            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
-                // Row 1: Import
+            // Section 1: Essentials
+            Section(header: sectionHeader("Essentials")) {
                 BentoCard(title: "Import Photos", icon: "photo.stack", color: .blue) {
                     activeTool = .importPhotos
                     isShowingPhotoPicker = true
@@ -438,19 +442,20 @@ struct DashboardView: View {
                     activeTool = .importFiles
                     withAnimation { isShowingImportTypeModal = true }
                 }
-                
-                // Row 2: Edit
-                BentoCard(title: "Edit Text", icon: "pencil.and.scribble", color: .teal) {
+            }
+            
+            // Section 2: Edit & Sign
+            Section(header: sectionHeader("Edit & Sign")) {
+                BentoCard(title: "Edit Text", icon: "pencil.and.scribble", color: .pink) {
                     activeTool = .editText
                     internalPickerTool = .editText
                 }
                 
-                BentoCard(title: "Sign PDF", icon: "signature", color: .pink) {
+                BentoCard(title: "Sign PDF", icon: "signature", color: .purple) {
                     activeTool = .signPDF
                     internalPickerTool = .signPDF
                 }
                 
-                // Row 3: Manage
                 BentoCard(title: "Organize Pages", icon: "doc.on.doc", color: .green) {
                     activeTool = .organizePages
                     internalPickerTool = .organizePages
@@ -460,9 +465,11 @@ struct DashboardView: View {
                     activeTool = .mergePDFs
                     internalPickerTool = .mergePDFs
                 }
-                
-                // Row 4: AI & Security
-                BentoCard(title: "Extract Text", icon: "text.viewfinder", color: .purple) {
+            }
+            
+            // Section 3: Security & AI
+            Section(header: sectionHeader("Security & AI")) {
+                BentoCard(title: "Extract Text", icon: "text.viewfinder", color: .teal) {
                     activeTool = .extractText
                     withAnimation { isShowingOCRSourceModal = true }
                 }
@@ -472,7 +479,6 @@ struct DashboardView: View {
                     internalPickerTool = .protectPDF
                 }
                 
-                // Row 5: More Security
                 BentoCard(title: "Unlock PDF", icon: "lock.open.fill", color: .blue) {
                     activeTool = .unlockPDF
                     internalPickerTool = .unlockPDF
@@ -484,6 +490,17 @@ struct DashboardView: View {
                 }
             }
         }
+    }
+    
+    private func sectionHeader(_ title: LocalizedStringKey) -> some View {
+        HStack {
+            Text(title)
+                .font(.title3.bold())
+                .foregroundStyle(.primary)
+            Spacer()
+        }
+        .padding(.top, 8)
+        .padding(.bottom, 4)
     }
     
     private var recentFilesSection: some View {
@@ -502,7 +519,7 @@ struct DashboardView: View {
                 ContentUnavailableView("No Recent Files", systemImage: "doc.on.doc")
                     .frame(height: 150)
                     .background(Color(uiColor: .secondarySystemGroupedBackground))
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                    .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
             } else {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 16) {
@@ -510,7 +527,7 @@ struct DashboardView: View {
                             NavigationLink(value: item) {
                                 RecentFileCard(item: item)
                             }
-                            .buttonStyle(.plain)
+                            .buttonStyle(ScaleButtonStyle())
                         }
                     }
                 }
@@ -550,9 +567,10 @@ struct DashboardView: View {
                         .frame(minHeight: 120) // Flexible height
                         .padding()
                         .background(Color(uiColor: .secondarySystemGroupedBackground))
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
-                        .shadow(color: .black.opacity(0.05), radius: 2)
+                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                        .shadow(color: .black.opacity(0.05), radius: 4)
                     }
+                    .buttonStyle(ScaleButtonStyle())
                 }
             }
             
@@ -564,8 +582,8 @@ struct DashboardView: View {
             .padding(.top, 8)
         }
         .padding(24)
-        .background(Color(uiColor: .systemGroupedBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 24))
+        .background(Material.regular)
+        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
         .shadow(radius: 20)
         .padding(32)
     }
@@ -600,9 +618,10 @@ struct DashboardView: View {
                         .frame(minHeight: 120)
                         .padding()
                         .background(Color(uiColor: .secondarySystemGroupedBackground))
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
-                        .shadow(color: .black.opacity(0.05), radius: 2)
+                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                        .shadow(color: .black.opacity(0.05), radius: 4)
                     }
+                    .buttonStyle(ScaleButtonStyle())
                 }
             }
             
@@ -614,8 +633,8 @@ struct DashboardView: View {
             .padding(.top, 8)
         }
         .padding(24)
-        .background(Color(uiColor: .systemGroupedBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 24))
+        .background(Material.regular)
+        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
         .shadow(radius: 20)
         .padding(32)
     }
@@ -891,25 +910,25 @@ struct BentoCard: View {
                     .background(
                         LinearGradient(colors: [color, color.opacity(0.7)], startPoint: .topLeading, endPoint: .bottomTrailing)
                     )
-                    .clipShape(Circle())
+                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous)) // Squircle Icon
                     .shadow(color: color.opacity(0.3), radius: 4, x: 0, y: 2)
-                    .padding(.leading, 8) // Shift icon right
+                    .padding(.leading, 8)
                 
                 Text(title)
-                    .font(.headline.bold()) // Larger font
+                    .font(.headline.bold())
                     .foregroundStyle(.primary)
                     .multilineTextAlignment(.leading)
                     .lineLimit(2)
-                    .minimumScaleFactor(0.5) // Allow scaling down if needed
+                    .minimumScaleFactor(0.5)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            .frame(height: 90) // Reduced height for compactness
+            .frame(height: 90)
             .padding(10)
             .background(Color(uiColor: .secondarySystemGroupedBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 16))
-            .shadow(color: Color.black.opacity(0.05), radius: 2, x: 0, y: 1)
+            .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous)) // Squircle Card
+            .shadow(color: Color.black.opacity(0.05), radius: 8, x: 0, y: 4) // Softer Shadow
         }
-        .buttonStyle(.plain)
+        .buttonStyle(ScaleButtonStyle()) // Add Press Animation
     }
 }
 
@@ -936,8 +955,8 @@ struct RecentFileCard: View {
             .frame(height: 100)
             .frame(maxWidth: .infinity)
             .background(Color.white)
-            .clipShape(RoundedRectangle(cornerRadius: 8))
-            .shadow(color: .black.opacity(0.05), radius: 2)
+            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .shadow(color: .black.opacity(0.05), radius: 4)
             
             Text(item.name)
                 .font(.subheadline.bold())
@@ -951,7 +970,16 @@ struct RecentFileCard: View {
         .padding(12)
         .frame(width: 140)
         .background(Color(uiColor: .secondarySystemGroupedBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .shadow(color: .black.opacity(0.05), radius: 4)
+    }
+}
+
+struct ScaleButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed ? 0.96 : 1)
+            .animation(.spring(response: 0.3, dampingFraction: 0.6), value: configuration.isPressed)
     }
 }
 
