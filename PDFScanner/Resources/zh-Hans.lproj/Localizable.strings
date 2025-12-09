@@ -43,6 +43,11 @@
 "Failed to create PDF from images." = "无法从图像创建 PDF。";
 "No text recognized." = "未识别到文本。";
 
+/* Dashboard Sections */
+"Essentials" = "基础功能";
+"Edit & Sign" = "编辑与签署";
+"Security & AI" = "安全与 AI";
+
 /* Import Types */
 "PDF Document" = "PDF 文档";
 "Word Document" = "Word 文档";
@@ -76,6 +81,10 @@
 "Terms of Use Placeholder" = "使用条款内容占位符";
 "Version" = "版本";
 "Mine" = "我的";
+"Get Premium" = "获取高级版";
+"Unlock all features" = "解锁所有功能";
+"Rate Us" = "给我们评分";
+"Share App" = "分享应用";
 
 /* Main Tab */
 "Home" = "首页";
@@ -104,7 +113,6 @@
 "Unlimited Scans & Exports" = "无限扫描与导出";
 "Text Recognition (OCR)" = "文本识别 (OCR)";
 "Sign & Protect Documents" = "签署与保护文档";
-"Remove All Ads" = "移除所有广告";
 "Free Trial Enabled" = "已开启免费试用";
 "Not sure yet? Enable free trial" = "还不确定？开启免费试用";
 "YEARLY ACCESS" = "年度会员";

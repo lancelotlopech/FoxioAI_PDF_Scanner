@@ -1,17 +1,45 @@
 import SwiftUI
+import StoreKit
 
 struct SubscriptionView: View {
     @Environment(\.dismiss) var dismiss
     @StateObject private var subManager = SubscriptionManager.shared
     @State private var selectedProductID: String = SubscriptionManager.mockYearly.id // Default to Yearly
     @State private var isTrialEnabled: Bool = false
+    @State private var isAnimating = false
     
-    // Theme Color (Deep Red, Solid)
-    private let brandColor = Color(red: 0.85, green: 0.1, blue: 0.1)
+    // Theme Gradient
+    private let brandGradient = LinearGradient(
+        colors: [
+            Color(red: 0.9, green: 0.2, blue: 0.4), // Deeper Pink
+            Color(red: 0.9, green: 0.5, blue: 0.1)  // Deeper Orange
+        ],
+        startPoint: .topLeading,
+        endPoint: .bottomTrailing
+    )
+    
+    // Solid Color for fallback (using the Pink)
+    private let brandColor = Color(red: 0.9, green: 0.2, blue: 0.4)
     
     // Mock Products
-    let weekly = SubscriptionManager.mockWeekly
-    let yearly = SubscriptionManager.mockYearly
+    let mockWeekly = SubscriptionManager.mockWeekly
+    let mockYearly = SubscriptionManager.mockYearly
+    
+    var weeklyProduct: Product? {
+        subManager.products.first(where: { $0.id == mockWeekly.id })
+    }
+    
+    var yearlyProduct: Product? {
+        subManager.products.first(where: { $0.id == mockYearly.id })
+    }
+    
+    var weeklyPrice: String {
+        weeklyProduct?.displayPrice ?? mockWeekly.displayPrice
+    }
+    
+    var yearlyPrice: String {
+        yearlyProduct?.displayPrice ?? mockYearly.displayPrice
+    }
     
     var body: some View {
         ZStack {
@@ -43,14 +71,17 @@ struct SubscriptionView: View {
         .onChange(of: isTrialEnabled) { oldValue, newValue in
             // Logic 1: If Free Trial is enabled -> Auto switch to Weekly plan
             if newValue {
-                 selectedProductID = weekly.id
+                 selectedProductID = mockWeekly.id
             }
         }
         .onChange(of: selectedProductID) { oldValue, newValue in
             // Logic 2: If User switches to Yearly -> Auto turn off Free Trial
-            if newValue == yearly.id {
+            if newValue == mockYearly.id {
                 isTrialEnabled = false
             }
+        }
+        .task {
+            await subManager.requestProducts()
         }
     }
     
@@ -124,16 +155,23 @@ struct SubscriptionView: View {
                     .fill(brandColor.opacity(0.05))
                     .frame(width: 100, height: 100)
                     .blur(radius: 10)
+                    .scaleEffect(isAnimating ? 1.2 : 1.0)
+                    .opacity(isAnimating ? 0.5 : 0.8)
+                    .animation(.easeInOut(duration: 2.0).repeatForever(autoreverses: true), value: isAnimating)
                 
                 // Outer Ring
                 Circle()
                     .stroke(brandColor.opacity(0.2), lineWidth: 1)
                     .frame(width: 90, height: 90)
+                    .rotationEffect(.degrees(isAnimating ? 360 : 0))
+                    .animation(.linear(duration: 20).repeatForever(autoreverses: false), value: isAnimating)
                 
                 // Middle Dashed Ring
                 Circle()
                     .stroke(brandColor.opacity(0.3), style: StrokeStyle(lineWidth: 1.5, dash: [6, 6]))
                     .frame(width: 76, height: 76)
+                    .rotationEffect(.degrees(isAnimating ? -360 : 0))
+                    .animation(.linear(duration: 15).repeatForever(autoreverses: false), value: isAnimating)
                 
                 // Inner Background
                 Circle()
@@ -143,11 +181,11 @@ struct SubscriptionView: View {
                 // Main Icon
                 Image(systemName: "doc.viewfinder.fill")
                     .font(.system(size: 28))
-                    .foregroundStyle(brandColor)
+                    .foregroundStyle(brandGradient)
                     .shadow(color: brandColor.opacity(0.3), radius: 6, y: 3)
                 
                 // Satellite Icons (Scaled Down)
-                Group {
+                ZStack {
                     // Lock
                     Circle()
                         .fill(Color(uiColor: .systemBackground))
@@ -158,7 +196,7 @@ struct SubscriptionView: View {
                                 .foregroundStyle(.red)
                                 .font(.system(size: 10, weight: .bold))
                         )
-                        .offset(x: 28, y: -24)
+                        .offset(x: 35, y: 0) // Start at 3 o'clock
                     
                     // Signature
                     Circle()
@@ -170,7 +208,7 @@ struct SubscriptionView: View {
                                 .foregroundStyle(.purple)
                                 .font(.system(size: 10, weight: .bold))
                         )
-                        .offset(x: -28, y: 20)
+                        .offset(x: -17.5, y: 30.3) // Start at ~7 o'clock
                         
                     // Cloud/Sync
                     Circle()
@@ -182,10 +220,15 @@ struct SubscriptionView: View {
                                 .foregroundStyle(.blue)
                                 .font(.system(size: 8, weight: .bold))
                         )
-                        .offset(x: 32, y: 12)
+                        .offset(x: -17.5, y: -30.3) // Start at ~11 o'clock
                 }
+                .rotationEffect(.degrees(isAnimating ? 360 : 0))
+                .animation(.linear(duration: 10).repeatForever(autoreverses: false), value: isAnimating)
             }
             .padding(.bottom, 2)
+            .onAppear {
+                isAnimating = true
+            }
             
             Text("Unlimited Access")
                 .font(.system(size: 20, weight: .heavy, design: .rounded))
@@ -197,10 +240,9 @@ struct SubscriptionView: View {
     
     private var featuresList: some View {
         VStack(alignment: .leading, spacing: 4) {
-            FeatureRow(text: "Unlimited Scans & Exports", color: brandColor)
-            FeatureRow(text: "Text Recognition (OCR)", color: brandColor)
-            FeatureRow(text: "Sign & Protect Documents", color: brandColor)
-            FeatureRow(text: "Remove All Ads", color: brandColor)
+            FeatureRow(text: "Unlimited Scans & Exports", gradient: brandGradient)
+            FeatureRow(text: "Text Recognition (OCR)", gradient: brandGradient)
+            FeatureRow(text: "Sign & Protect Documents", gradient: brandGradient)
         }
         .frame(maxWidth: .infinity) // Center the block
     }
@@ -231,23 +273,23 @@ struct SubscriptionView: View {
             // Yearly Option
             PricingCardNew(
                 title: "YEARLY ACCESS",
-                price: "$39.99/year",
+                price: "\(yearlyPrice)/year",
                 subtitle: "Just $0.76 per week",
                 badge: "Save 80%",
-                isSelected: selectedProductID == yearly.id,
-                brandColor: brandColor,
-                onTap: { selectedProductID = yearly.id }
+                isSelected: selectedProductID == mockYearly.id,
+                brandGradient: brandGradient,
+                onTap: { selectedProductID = mockYearly.id }
             )
             
             // Weekly Option
             PricingCardNew(
                 title: "WEEKLY ACCESS",
-                price: "$6.99/week",
+                price: "\(weeklyPrice)/week",
                 subtitle: isTrialEnabled ? "3 Days Free Trial" : nil,
                 badge: isTrialEnabled ? "Popular" : nil,
-                isSelected: selectedProductID == weekly.id,
-                brandColor: brandColor,
-                onTap: { selectedProductID = weekly.id }
+                isSelected: selectedProductID == mockWeekly.id,
+                brandGradient: brandGradient,
+                onTap: { selectedProductID = mockWeekly.id }
             )
         }
     }
@@ -266,21 +308,36 @@ struct SubscriptionView: View {
     private var bottomSection: some View {
         VStack(spacing: 8) {
             Button {
-                print("Purchase \(selectedProductID)")
+                Task {
+                    if let product = subManager.products.first(where: { $0.id == selectedProductID }) {
+                        try? await subManager.purchase(product)
+                    } else {
+                        print("Product not found, using mock purchase flow or showing error")
+                    }
+                }
             } label: {
-                Text(LocalizedStringKey(buttonText))
-                    .font(.headline.bold())
-                    .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 48)
-                    .background(brandColor) // Solid Color
-                    .clipShape(RoundedRectangle(cornerRadius: 24))
-                    .shadow(color: brandColor.opacity(0.3), radius: 8, y: 4)
+                if subManager.isLoading {
+                    ProgressView()
+                        .tint(.white)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 48)
+                        .background(brandGradient)
+                        .clipShape(RoundedRectangle(cornerRadius: 24))
+                } else {
+                    Text(LocalizedStringKey(buttonText))
+                        .font(.headline.bold())
+                        .foregroundStyle(.white)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 48)
+                        .background(brandGradient) // Gradient
+                        .clipShape(RoundedRectangle(cornerRadius: 24))
+                        .shadow(color: brandColor.opacity(0.3), radius: 8, y: 4)
+                }
             }
             
             HStack(spacing: 20) {
-                Link("Terms of Usage", destination: URL(string: "https://termsofuspdf.moonspace.workers.dev/")!)
-                Link("Privacy Policy", destination: URL(string: "https://privacypolicypdf.moonspace.workers.dev/")!)
+                Link("Terms of Usage", destination: URL(string: "https://foxio-pdf-scanner.pages.dev/#terms")!)
+                Link("Privacy Policy", destination: URL(string: "https://foxio-pdf-scanner.pages.dev/#privacy")!)
             }
             .font(.caption2)
             .foregroundStyle(.secondary)
@@ -304,13 +361,13 @@ struct SubscriptionView: View {
 
 struct FeatureRow: View {
     let text: LocalizedStringKey
-    let color: Color
+    let gradient: LinearGradient
     
     var body: some View {
         HStack(spacing: 8) {
             Image(systemName: "checkmark.circle.fill")
                 .font(.system(size: 14, weight: .bold)) // Smaller
-                .foregroundStyle(color)
+                .foregroundStyle(gradient)
             
             Text(text)
                 .font(.footnote) // Smaller
@@ -321,11 +378,11 @@ struct FeatureRow: View {
 
 struct PricingCardNew: View {
     let title: LocalizedStringKey
-    let price: LocalizedStringKey
+    let price: String
     let subtitle: String?
     let badge: String?
     let isSelected: Bool
-    let brandColor: Color
+    let brandGradient: LinearGradient
     let onTap: () -> Void
     
     var body: some View {
@@ -333,9 +390,17 @@ struct PricingCardNew: View {
             ZStack(alignment: .topTrailing) {
                 HStack {
                     // Radio Circle
-                    Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                        .font(.title3)
-                        .foregroundStyle(isSelected ? brandColor : .gray.opacity(0.5))
+                    ZStack {
+                        if isSelected {
+                            Image(systemName: "checkmark.circle.fill")
+                                .font(.title3)
+                                .foregroundStyle(brandGradient)
+                        } else {
+                            Image(systemName: "circle")
+                                .font(.title3)
+                                .foregroundStyle(.gray.opacity(0.5))
+                        }
+                    }
                     
                     VStack(alignment: .leading, spacing: 2) {
                         Text(title)
@@ -345,7 +410,7 @@ struct PricingCardNew: View {
                         if let subtitle = subtitle {
                             Text(LocalizedStringKey(subtitle))
                                 .font(.caption2)
-                                .foregroundStyle(isSelected ? brandColor : .secondary)
+                                .foregroundStyle(isSelected ? brandGradient : LinearGradient(colors: [.secondary], startPoint: .leading, endPoint: .trailing))
                                 .fontWeight(isSelected ? .medium : .regular)
                                 .fixedSize(horizontal: false, vertical: true)
                         }
@@ -364,7 +429,7 @@ struct PricingCardNew: View {
                 .clipShape(RoundedRectangle(cornerRadius: 12))
                 .overlay(
                     RoundedRectangle(cornerRadius: 12)
-                        .stroke(isSelected ? brandColor : Color.clear, lineWidth: 2)
+                        .strokeBorder(isSelected ? brandGradient : LinearGradient(colors: [.clear], startPoint: .leading, endPoint: .trailing), lineWidth: 2)
                 )
                 
                 if let badge = badge {

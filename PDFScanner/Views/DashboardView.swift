@@ -123,6 +123,7 @@ struct OCRResultData: Identifiable {
 struct DashboardView: View {
     @EnvironmentObject var store: FoxDocumentStore
     @Binding var selectedTab: Int
+    @ObservedObject var subscriptionManager = SubscriptionManager.shared
     
     // Sheet States
     @State private var isShowingScanner = false
@@ -158,6 +159,9 @@ struct DashboardView: View {
     
     // Subscription Sheet
     @State private var isShowingSubscription = false
+    
+    // Subscription State
+    // @State private var showSubscription = false // Using isShowingSubscription instead
     
     @State private var selectedPhotos: [PhotosPickerItem] = []
     
@@ -197,6 +201,7 @@ struct DashboardView: View {
                 .navigationDestination(for: SecurityScanDestination.self) { dest in
                     SecurityScanView(item: dest.item)
                 }
+                // Duplicate modifier removed (isShowingSubscription is already handled at end of body)
                 
                 // Custom Modal Overlay
                 if isShowingImportTypeModal {
@@ -351,81 +356,89 @@ struct DashboardView: View {
             } label: {
                 HStack(spacing: 6) {
                     Image(systemName: "crown.fill")
-                        .foregroundStyle(LinearGradient(colors: [
-                            Color(red: 1.0, green: 0.92, blue: 0.6), // Light Gold
-                            Color(red: 1.0, green: 0.84, blue: 0.2)  // Gold
-                        ], startPoint: .topLeading, endPoint: .bottomTrailing))
+                        .foregroundStyle(.white)
                     Text("Pro")
                         .font(.subheadline.bold())
-                        .foregroundStyle(.primary)
+                        .foregroundStyle(.white)
                 }
                 .padding(.horizontal, 16)
                 .padding(.vertical, 8)
-                .background(Material.ultraThin)
+                .background(
+                    LinearGradient(
+                        colors: [
+                            Color(red: 0.9, green: 0.2, blue: 0.4), // Deeper Pink
+                            Color(red: 0.9, green: 0.5, blue: 0.1)  // Deeper Orange
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
                 .clipShape(Capsule())
-                .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
+                .shadow(color: Color(red: 0.9, green: 0.2, blue: 0.4).opacity(0.3), radius: 4, x: 0, y: 2)
             }
         }
         .padding(.top, 8)
     }
     
     private var heroScanButton: some View {
-        Button {
-            isShowingScanner = true
-        } label: {
-            HStack {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Smart Scan")
-                        .font(.system(size: 28, weight: .heavy, design: .rounded))
-                        .foregroundStyle(.white)
-                    Text("AI-Powered Capture")
-                        .font(.subheadline)
-                        .fontWeight(.medium)
-                        .foregroundStyle(.white.opacity(0.9))
-                }
-                Spacer()
-                
-                ZStack {
-                    Circle()
-                        .fill(.white.opacity(0.2))
-                        .frame(width: 72, height: 72)
-                    Image(systemName: "doc.viewfinder")
-                        .font(.system(size: 36, weight: .semibold))
-                        .foregroundStyle(.white)
-                }
-            }
-            .padding(.horizontal, 24)
-            .padding(.vertical, 32)
-            .background(
-                ZStack {
-                    LinearGradient(
-                        colors: [Color(red: 1.0, green: 0.3, blue: 0.5), Color(red: 1.0, green: 0.6, blue: 0.2)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                    
-                    // Subtle Pattern
-                    Group {
-                        Circle()
-                            .fill(.white.opacity(0.1))
-                            .frame(width: 200, height: 200)
-                            .offset(x: 100, y: -50)
-                            .blur(radius: 30)
-                        
-                        Circle()
-                            .fill(.white.opacity(0.1))
-                            .frame(width: 150, height: 150)
-                            .offset(x: -100, y: 80)
-                            .blur(radius: 20)
+        VStack(spacing: 8) {
+            Button {
+                isShowingScanner = true
+            } label: {
+                HStack {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Smart Scan")
+                            .font(.system(size: 28, weight: .heavy, design: .rounded))
+                            .foregroundStyle(.white)
+                        Text("AI-Powered Capture")
+                            .font(.subheadline)
+                            .fontWeight(.medium)
+                            .foregroundStyle(.white.opacity(0.9))
                     }
-                    .allowsHitTesting(false)
+                    Spacer()
+                    
+                    ZStack {
+                        Circle()
+                            .fill(.white.opacity(0.2))
+                            .frame(width: 72, height: 72)
+                        Image(systemName: "doc.viewfinder")
+                            .font(.system(size: 36, weight: .semibold))
+                            .foregroundStyle(.white)
+                    }
                 }
-            )
-            .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
-            .contentShape(RoundedRectangle(cornerRadius: 28, style: .continuous)) // Fix hit testing
-            .shadow(color: Color(red: 1.0, green: 0.3, blue: 0.5).opacity(0.4), radius: 16, x: 0, y: 8)
+                .padding(.horizontal, 24)
+                .padding(.vertical, 32)
+                .background(
+                    ZStack {
+                        LinearGradient(
+                            colors: [Color(red: 1.0, green: 0.3, blue: 0.5), Color(red: 1.0, green: 0.6, blue: 0.2)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                        
+                        // Subtle Pattern
+                        Group {
+                            Circle()
+                                .fill(.white.opacity(0.1))
+                                .frame(width: 200, height: 200)
+                                .offset(x: 100, y: -50)
+                                .blur(radius: 30)
+                            
+                            Circle()
+                                .fill(.white.opacity(0.1))
+                                .frame(width: 150, height: 150)
+                                .offset(x: -100, y: 80)
+                                .blur(radius: 20)
+                        }
+                        .allowsHitTesting(false)
+                    }
+                )
+                .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
+                .contentShape(RoundedRectangle(cornerRadius: 28, style: .continuous)) // Fix hit testing
+                .shadow(color: Color(red: 1.0, green: 0.3, blue: 0.5).opacity(0.4), radius: 16, x: 0, y: 8)
+            }
+            .buttonStyle(ScaleButtonStyle())
         }
-        .buttonStyle(ScaleButtonStyle())
     }
     
     private var toolsSection: some View {
@@ -446,14 +459,22 @@ struct DashboardView: View {
             
             // Section 2: Edit & Sign
             Section(header: sectionHeader("Edit & Sign")) {
-                BentoCard(title: "Edit Text", icon: "pencil.and.scribble", color: .pink) {
-                    activeTool = .editText
-                    internalPickerTool = .editText
+                BentoCard(title: "Edit Text", icon: "pencil.and.scribble", color: .pink, isPro: true) {
+                    if subscriptionManager.checkAccess(for: .ocr) {
+                        activeTool = .editText
+                        internalPickerTool = .editText
+                    } else {
+                        isShowingSubscription = true
+                    }
                 }
                 
-                BentoCard(title: "Sign PDF", icon: "signature", color: .purple) {
-                    activeTool = .signPDF
-                    internalPickerTool = .signPDF
+                BentoCard(title: "Sign PDF", icon: "signature", color: .purple, isPro: true) {
+                    if subscriptionManager.checkAccess(for: .signature) {
+                        activeTool = .signPDF
+                        internalPickerTool = .signPDF
+                    } else {
+                        isShowingSubscription = true
+                    }
                 }
                 
                 BentoCard(title: "Organize Pages", icon: "doc.on.doc", color: .green) {
@@ -469,9 +490,13 @@ struct DashboardView: View {
             
             // Section 3: Security & AI
             Section(header: sectionHeader("Security & AI")) {
-                BentoCard(title: "Extract Text", icon: "text.viewfinder", color: .teal) {
-                    activeTool = .extractText
-                    withAnimation { isShowingOCRSourceModal = true }
+                BentoCard(title: "Extract Text", icon: "text.viewfinder", color: .teal, isPro: true) {
+                    if subscriptionManager.checkAccess(for: .ocr) {
+                        activeTool = .extractText
+                        withAnimation { isShowingOCRSourceModal = true }
+                    } else {
+                        isShowingSubscription = true
+                    }
                 }
                 
                 BentoCard(title: "Protect PDF", icon: "lock.fill", color: .red) {
@@ -484,9 +509,13 @@ struct DashboardView: View {
                     internalPickerTool = .unlockPDF
                 }
                 
-                BentoCard(title: "Security Scan", icon: "checkmark.shield.fill", color: .mint) {
-                    activeTool = .securityScan
-                    internalPickerTool = .securityScan
+                BentoCard(title: "Security Scan", icon: "checkmark.shield.fill", color: .mint, isPro: true) {
+                    if SubscriptionManager.shared.checkAccess(for: .security) {
+                        activeTool = .securityScan
+                        internalPickerTool = .securityScan
+                    } else {
+                        isShowingSubscription = true
+                    }
                 }
             }
         }
@@ -854,9 +883,15 @@ struct DashboardView: View {
                         }
                     }
                 } else if tool == .securityScan {
-                    if let item = items.first {
+                    if SubscriptionManager.shared.checkAccess(for: .security) {
+                        if let item = items.first {
+                            await MainActor.run {
+                                navigationPath.append(SecurityScanDestination(item: item))
+                            }
+                        }
+                    } else {
                         await MainActor.run {
-                            navigationPath.append(SecurityScanDestination(item: item))
+                            isShowingSubscription = true
                         }
                     }
                 }
@@ -898,35 +933,51 @@ struct BentoCard: View {
     let title: LocalizedStringKey
     let icon: String
     let color: Color
+    var isPro: Bool = false
     let action: () -> Void
+    
+    @ObservedObject var subscriptionManager = SubscriptionManager.shared
     
     var body: some View {
         Button(action: action) {
-            VStack(alignment: .leading, spacing: 8) {
-                Image(systemName: icon)
-                    .font(.title2)
-                    .foregroundStyle(.white)
-                    .frame(width: 44, height: 44)
-                    .background(
-                        LinearGradient(colors: [color, color.opacity(0.7)], startPoint: .topLeading, endPoint: .bottomTrailing)
-                    )
-                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous)) // Squircle Icon
-                    .shadow(color: color.opacity(0.3), radius: 4, x: 0, y: 2)
-                    .padding(.leading, 8)
+            ZStack(alignment: .topTrailing) {
+                VStack(alignment: .leading, spacing: 8) {
+                    Image(systemName: icon)
+                        .font(.title2)
+                        .foregroundStyle(.white)
+                        .frame(width: 44, height: 44)
+                        .background(
+                            LinearGradient(colors: [color, color.opacity(0.7)], startPoint: .topLeading, endPoint: .bottomTrailing)
+                        )
+                        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous)) // Squircle Icon
+                        .shadow(color: color.opacity(0.3), radius: 4, x: 0, y: 2)
+                        .padding(.leading, 8)
+                    
+                    Text(title)
+                        .font(.headline.bold())
+                        .foregroundStyle(.primary)
+                        .multilineTextAlignment(.leading)
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.5)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .frame(height: 90)
+                .padding(10)
+                .background(Color(uiColor: .secondarySystemGroupedBackground))
+                .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous)) // Squircle Card
+                .shadow(color: Color.black.opacity(0.05), radius: 8, x: 0, y: 4) // Softer Shadow
                 
-                Text(title)
-                    .font(.headline.bold())
-                    .foregroundStyle(.primary)
-                    .multilineTextAlignment(.leading)
-                    .lineLimit(2)
-                    .minimumScaleFactor(0.5)
+                if isPro && !subscriptionManager.isPremium {
+                    Text("PRO")
+                        .font(.system(size: 10, weight: .bold))
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(Color.black.opacity(0.7))
+                        .clipShape(Capsule())
+                        .padding(8)
+                }
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .frame(height: 90)
-            .padding(10)
-            .background(Color(uiColor: .secondarySystemGroupedBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous)) // Squircle Card
-            .shadow(color: Color.black.opacity(0.05), radius: 8, x: 0, y: 4) // Softer Shadow
         }
         .buttonStyle(ScaleButtonStyle()) // Add Press Animation
     }

@@ -1,5 +1,4 @@
 import SwiftUI
-import AppTrackingTransparency
 
 struct SplashView: View {
     @Binding var isActive: Bool
@@ -58,26 +57,12 @@ struct SplashView: View {
             } else {
                 timer.invalidate()
                 
-                // Request ATT Authorization before dismissing
-                requestTrackingAuthorization {
-                    withAnimation(.easeOut(duration: 0.5)) {
-                        opacity = 0.0
-                    }
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                        isActive = true
-                    }
+                // Transition to main app
+                withAnimation(.easeOut(duration: 0.5)) {
+                    opacity = 0.0
                 }
-            }
-        }
-    }
-    
-    func requestTrackingAuthorization(completion: @escaping () -> Void) {
-        // Delay slightly to ensure the view is fully visible and stable
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            ATTrackingManager.requestTrackingAuthorization { status in
-                // Continue regardless of status
-                DispatchQueue.main.async {
-                    completion()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    isActive = true
                 }
             }
         }

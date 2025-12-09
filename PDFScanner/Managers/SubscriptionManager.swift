@@ -12,10 +12,17 @@ class SubscriptionManager: ObservableObject {
     @Published var isLoading = false
     @Published var errorMessage: String?
     
+    // Feature Enums
+    enum Feature {
+        case ocr
+        case signature
+        case security
+    }
+    
     // Replace these with your actual Product IDs from App Store Connect
     private let productDict: [String: String] = [
-        "weekly": "com.pdfscanner.weekly",
-        "yearly": "com.pdfscanner.yearly"
+        "weekly": "com.pdfscanner.weekly6.99",
+        "yearly": "yearlypro.39.99"
     ]
     
     private var updates: Task<Void, Never>? = nil
@@ -30,6 +37,13 @@ class SubscriptionManager: ObservableObject {
             // In a real app, you would call this. For UI dev, we might verify mock data.
             // await requestProducts()
         }
+    }
+    
+    // MARK: - Usage Tracking
+    
+    func checkAccess(for feature: Feature) -> Bool {
+        if isPremium { return true }
+        return false
     }
     
     deinit {
@@ -145,7 +159,7 @@ extension SubscriptionManager {
     }
     
     static let mockWeekly = MockProduct(
-        id: "com.pdfscanner.weekly",
+        id: "com.pdfscanner.weekly6.99",
         displayName: "Weekly Access",
         displayPrice: "$6.99",
         price: 6.99,
@@ -155,10 +169,10 @@ extension SubscriptionManager {
     )
     
     static let mockYearly = MockProduct(
-        id: "com.pdfscanner.yearly",
+        id: "yearlypro.39.99",
         displayName: "Yearly Access",
-        displayPrice: "$49.99",
-        price: 49.99,
+        displayPrice: "$39.99",
+        price: 39.99,
         description: "Yearly subscription",
         period: "year",
         trial: "3 Days Free"

@@ -76,6 +76,10 @@
 "Terms of Use Placeholder" = "Inhalt der Nutzungsbedingungen";
 "Version" = "Version";
 "Mine" = "Ich";
+"Get Premium" = "Premium holen";
+"Unlock all features" = "Alle Funktionen freischalten";
+"Rate Us" = "Bewerten Sie uns";
+"Share App" = "App teilen";
 
 /* Main Tab */
 "Home" = "Start";
@@ -104,7 +108,6 @@
 "Unlimited Scans & Exports" = "Unbegrenzte Scans & Exporte";
 "Text Recognition (OCR)" = "Texterkennung (OCR)";
 "Sign & Protect Documents" = "Dokumente unterschreiben & schützen";
-"Remove All Ads" = "Werbung entfernen";
 "Free Trial Enabled" = "Kostenlose Testversion aktiviert";
 "Not sure yet? Enable free trial" = "Unsicher? Testversion aktivieren";
 "YEARLY ACCESS" = "JÄHRLICHER ZUGANG";

@@ -6,6 +6,8 @@
     <string>We need camera access to scan documents.</string>
     <key>NSPhotoLibraryAddUsageDescription</key>
     <string>We need permission to save exported images to your photo library.</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>We need access to your photo library to import documents and images.</string>
     <key>NSUserTrackingUsageDescription</key>
     <string>This identifier will be used to deliver personalized ads to you.</string>
     <key>UILaunchScreen</key>

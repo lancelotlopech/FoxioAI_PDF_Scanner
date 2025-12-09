@@ -43,6 +43,11 @@
 "Failed to create PDF from images." = "Error al crear PDF desde imágenes.";
 "No text recognized." = "No se reconoció texto.";
 
+/* Dashboard Sections */
+"Essentials" = "Esenciales";
+"Edit & Sign" = "Editar y Firmar";
+"Security & AI" = "Seguridad e IA";
+
 /* Import Types */
 "PDF Document" = "Documento PDF";
 "Word Document" = "Documento Word";
@@ -76,6 +81,10 @@
 "Terms of Use Placeholder" = "Contenido de los Términos de Uso";
 "Version" = "Versión";
 "Mine" = "Mío";
+"Get Premium" = "Obtener Premium";
+"Unlock all features" = "Desbloquear todas las funciones";
+"Rate Us" = "Califícanos";
+"Share App" = "Compartir App";
 
 /* Main Tab */
 "Home" = "Inicio";
@@ -104,7 +113,6 @@
 "Unlimited Scans & Exports" = "Escaneos y Exportaciones Ilimitados";
 "Text Recognition (OCR)" = "Reconocimiento de Texto (OCR)";
 "Sign & Protect Documents" = "Firmar y Proteger Documentos";
-"Remove All Ads" = "Eliminar Anuncios";
 "Free Trial Enabled" = "Prueba Gratuita Activada";
 "Not sure yet? Enable free trial" = "¿No estás seguro? Activa la prueba gratuita";
 "YEARLY ACCESS" = "ACCESO ANUAL";

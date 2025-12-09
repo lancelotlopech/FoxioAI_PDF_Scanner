@@ -20,6 +20,12 @@ struct FilesView: View {
     // View Mode Preference (Persisted)
     @AppStorage("isGridView") private var isGridView = true // Default to Grid
     
+    // Subscription State
+    @State private var isShowingSubscription = false
+    
+    // Navigation Path
+    @State private var path = NavigationPath()
+    
     var filteredDocuments: [ScannedItem] {
         if searchText.isEmpty {
             return store.documents
@@ -35,7 +41,7 @@ struct FilesView: View {
     ]
     
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $path) {
             ZStack {
                 Color(uiColor: .systemGroupedBackground)
                     .ignoresSafeArea()
@@ -153,6 +159,12 @@ struct FilesView: View {
             .navigationDestination(for: ScannedItem.self) { item in
                 FoxPDFViewer(item: item)
             }
+            .navigationDestination(for: SecurityScanDestination.self) { dest in
+                SecurityScanView(item: dest.item)
+            }
+            .fullScreenCover(isPresented: $isShowingSubscription) {
+                SubscriptionView()
+            }
         }
     }
     
@@ -233,6 +245,16 @@ struct FilesView: View {
             isRenaming = true
         } label: {
             Label("Rename", systemImage: "pencil")
+        }
+        
+        Button {
+            if SubscriptionManager.shared.checkAccess(for: .security) {
+                path.append(SecurityScanDestination(item: item))
+            } else {
+                isShowingSubscription = true
+            }
+        } label: {
+            Label("Security Scan", systemImage: "checkmark.shield")
         }
         
         if let url = item.url {

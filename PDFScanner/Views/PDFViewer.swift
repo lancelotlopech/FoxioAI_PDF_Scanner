@@ -70,124 +70,19 @@ struct FoxPDFViewer: View {
     // Scanning Effect State
     @State private var isScanning = false
     
+    // Subscription State
+    @State private var showSubscription = false
+    @State private var lockedFeature: String?
+    
     var body: some View {
         ZStack {
             VStack(spacing: 0) {
                 if isEditMode {
-                    // Edit Mode Top Bar
-                    HStack(spacing: 12) {
-                        Button("Exit") {
-                            isShowingDiscardAlert = true
-                        }
-                        .foregroundStyle(.red)
-                        .font(.subheadline)
-                        
-                        Spacer()
-                        
-                        // Style Tools (Split)
-                        if textEditData != nil {
-                            HStack(spacing: 20) {
-                                // Font Size
-                                Button {
-                                    withAnimation { activeStyleTool = (activeStyleTool == .font) ? nil : .font }
-                                } label: {
-                                    Image(systemName: "textformat.size")
-                                        .font(.system(size: 16))
-                                        .foregroundColor(activeStyleTool == .font ? .blue : .primary)
-                                        .padding(6)
-                                        .background(activeStyleTool == .font ? Color.blue.opacity(0.1) : Color.clear)
-                                        .cornerRadius(6)
-                                }
-                                
-                                // Spacing
-                                Button {
-                                    withAnimation { activeStyleTool = (activeStyleTool == .spacing) ? nil : .spacing }
-                                } label: {
-                                    Image(systemName: "arrow.left.and.right.text.vertical")
-                                        .font(.system(size: 16))
-                                        .foregroundColor(activeStyleTool == .spacing ? .blue : .primary)
-                                        .padding(6)
-                                        .background(activeStyleTool == .spacing ? Color.blue.opacity(0.1) : Color.clear)
-                                        .cornerRadius(6)
-                                }
-                                
-                                // Background Transparency (Direct Toggle)
-                                Button {
-                                    if var data = textEditData {
-                                        data.attributes.isTransparent.toggle()
-                                        textEditData = data
-                                    }
-                                } label: {
-                                    Image(systemName: (textEditData?.attributes.isTransparent ?? false) ? "square.slash" : "square.fill")
-                                        .font(.system(size: 16))
-                                        .foregroundColor(.primary)
-                                        .padding(6)
-                                }
-                            }
-                        }
-                        
-                        Spacer()
-                        
-                        // Select/Draw Mode Button
-                        Button {
-                            if textEditData != nil {
-                                // If box exists, clicking this clears it (Done editing)
-                                textEditData = nil
-                                isDrawMode = false
-                            } else {
-                                // Toggle Draw Mode
-                                isDrawMode.toggle()
-                            }
-                        } label: {
-                            Image(systemName: "viewfinder")
-                                .font(.system(size: 18, weight: .bold))
-                                .foregroundColor(isDrawMode || textEditData != nil ? .white : .blue)
-                                .padding(6)
-                                .background(isDrawMode || textEditData != nil ? Color.blue : Color.clear)
-                                .clipShape(Circle())
-                        }
-                        
-                        Button("Save") {
-                            saveChanges()
-                        }
-                        .fontWeight(.bold)
-                        .font(.subheadline)
-                    }
-                    .padding(.horizontal)
-                    .padding(.vertical, 8)
-                    .background(Color(uiColor: .systemBackground))
-                    .shadow(radius: 1)
+                    editModeTopBar
                     
                     // Mini Slider Overlay
                     if let tool = activeStyleTool, let data = textEditData {
-                        VStack {
-                            switch tool {
-                            case .font:
-                                HStack {
-                                    Text("Size").font(.caption)
-                                    Slider(value: Binding(
-                                        get: { data.attributes.fontSize },
-                                        set: { textEditData?.attributes.fontSize = $0 }
-                                    ), in: 8...72, step: 1)
-                                    Text("\(Int(data.attributes.fontSize))").font(.caption).frame(width: 25)
-                                }
-                            case .spacing:
-                                HStack {
-                                    Text("Space").font(.caption)
-                                    Slider(value: Binding(
-                                        get: { data.attributes.letterSpacing },
-                                        set: { textEditData?.attributes.letterSpacing = $0 }
-                                    ), in: -2...10, step: 0.5)
-                                    Text(String(format: "%.1f", data.attributes.letterSpacing)).font(.caption).frame(width: 25)
-                                }
-                            default: EmptyView()
-                            }
-                        }
-                        .padding(10)
-                        .background(.regularMaterial)
-                        .cornerRadius(10)
-                        .padding(.horizontal)
-                        .transition(.move(edge: .top).combined(with: .opacity))
+                        editModeSliderOverlay(tool: tool, data: data)
                     }
                 }
                 
@@ -212,45 +107,7 @@ struct FoxPDFViewer: View {
                     
                     // Bottom Edit Toolbar (Input Field)
                     if let data = textEditData {
-                        VStack(spacing: 0) {
-                            Divider()
-                            HStack(spacing: 12) {
-                                // Delete Button
-                                Button {
-                                    isDiscarding = true
-                                    textEditData = nil
-                                } label: {
-                                    Image(systemName: "xmark.circle.fill")
-                                        .font(.title2)
-                                        .foregroundColor(.red)
-                                }
-                                
-                                TextField("Enter text...", text: Binding(
-                                    get: { data.newText },
-                                    set: { textEditData?.newText = $0 }
-                                ))
-                                .textFieldStyle(.roundedBorder)
-                                .focused($isInputFocused)
-                                .submitLabel(.done)
-                                
-                                // Done Button
-                                Button {
-                                    isInputFocused = false
-                                    // Commit changes (handled by textEditData binding updates)
-                                    textEditData = nil // Exit edit mode for this box
-                                } label: {
-                                    Image(systemName: "checkmark.circle.fill")
-                                        .font(.title2)
-                                        .foregroundColor(.green)
-                                }
-                            }
-                            .padding()
-                            .background(Color(uiColor: .systemBackground))
-                        }
-                        .transition(.move(edge: .bottom))
-                        .onAppear {
-                            isInputFocused = true
-                        }
+                        bottomEditToolbar(data: data)
                     }
                 }
             }
@@ -282,7 +139,12 @@ struct FoxPDFViewer: View {
                 ToolbarItem(placement: .primaryAction) {
                     HStack {
                         Button {
-                            startScanningEffect()
+                            if SubscriptionManager.shared.checkAccess(for: .ocr) {
+                                startScanningEffect()
+                            } else {
+                                lockedFeature = "OCR"
+                                showSubscription = true
+                            }
                         } label: {
                             Label("Edit Text", systemImage: "pencil.and.scribble")
                         }
@@ -298,7 +160,12 @@ struct FoxPDFViewer: View {
                         }
                         
                         Button {
-                            isShowingSignatureCanvas = true
+                            if SubscriptionManager.shared.checkAccess(for: .signature) {
+                                isShowingSignatureCanvas = true
+                            } else {
+                                lockedFeature = "Signature"
+                                showSubscription = true
+                            }
                         } label: {
                             Label("Sign", systemImage: "signature")
                         }
@@ -327,6 +194,9 @@ struct FoxPDFViewer: View {
                     }
                 }
             }
+        }
+        .fullScreenCover(isPresented: $showSubscription) {
+            SubscriptionView()
         }
         .alert(String(localized: "Saved"), isPresented: $isShowingSaveAlert) {
             Button("OK", role: .cancel) { }
@@ -391,6 +261,168 @@ struct FoxPDFViewer: View {
         }
     }
     
+    // MARK: - Subviews
+    
+    private var editModeTopBar: some View {
+        HStack(spacing: 12) {
+            Button("Exit") {
+                isShowingDiscardAlert = true
+            }
+            .foregroundStyle(.red)
+            .font(.subheadline)
+            
+            Spacer()
+            
+            // Style Tools (Split)
+            if textEditData != nil {
+                HStack(spacing: 20) {
+                    // Font Size
+                    Button {
+                        withAnimation { activeStyleTool = (activeStyleTool == .font) ? nil : .font }
+                    } label: {
+                        Image(systemName: "textformat.size")
+                            .font(.system(size: 16))
+                            .foregroundColor(activeStyleTool == .font ? .blue : .primary)
+                            .padding(6)
+                            .background(activeStyleTool == .font ? Color.blue.opacity(0.1) : Color.clear)
+                            .cornerRadius(6)
+                    }
+                    
+                    // Spacing
+                    Button {
+                        withAnimation { activeStyleTool = (activeStyleTool == .spacing) ? nil : .spacing }
+                    } label: {
+                        Image(systemName: "arrow.left.and.right.text.vertical")
+                            .font(.system(size: 16))
+                            .foregroundColor(activeStyleTool == .spacing ? .blue : .primary)
+                            .padding(6)
+                            .background(activeStyleTool == .spacing ? Color.blue.opacity(0.1) : Color.clear)
+                            .cornerRadius(6)
+                    }
+                    
+                    // Background Transparency (Direct Toggle)
+                    Button {
+                        if var data = textEditData {
+                            data.attributes.isTransparent.toggle()
+                            textEditData = data
+                        }
+                    } label: {
+                        Image(systemName: (textEditData?.attributes.isTransparent ?? false) ? "square.slash" : "square.fill")
+                            .font(.system(size: 16))
+                            .foregroundColor(.primary)
+                            .padding(6)
+                    }
+                }
+            }
+            
+            Spacer()
+            
+            // Select/Draw Mode Button
+            Button {
+                if textEditData != nil {
+                    // If box exists, clicking this clears it (Done editing)
+                    textEditData = nil
+                    isDrawMode = false
+                } else {
+                    // Toggle Draw Mode
+                    isDrawMode.toggle()
+                }
+            } label: {
+                Image(systemName: "viewfinder")
+                    .font(.system(size: 18, weight: .bold))
+                    .foregroundColor(isDrawMode || textEditData != nil ? .white : .blue)
+                    .padding(6)
+                    .background(isDrawMode || textEditData != nil ? Color.blue : Color.clear)
+                    .clipShape(Circle())
+            }
+            
+            Button("Save") {
+                saveChanges()
+            }
+            .fontWeight(.bold)
+            .font(.subheadline)
+        }
+        .padding(.horizontal)
+        .padding(.vertical, 8)
+        .background(Color(uiColor: .systemBackground))
+        .shadow(radius: 1)
+    }
+    
+    private func editModeSliderOverlay(tool: StyleTool, data: TextEditData) -> some View {
+        VStack {
+            switch tool {
+            case .font:
+                HStack {
+                    Text("Size").font(.caption)
+                    Slider(value: Binding(
+                        get: { data.attributes.fontSize },
+                        set: { textEditData?.attributes.fontSize = $0 }
+                    ), in: 8...72, step: 1)
+                    Text("\(Int(data.attributes.fontSize))").font(.caption).frame(width: 25)
+                }
+            case .spacing:
+                HStack {
+                    Text("Space").font(.caption)
+                    Slider(value: Binding(
+                        get: { data.attributes.letterSpacing },
+                        set: { textEditData?.attributes.letterSpacing = $0 }
+                    ), in: -2...10, step: 0.5)
+                    Text(String(format: "%.1f", data.attributes.letterSpacing)).font(.caption).frame(width: 25)
+                }
+            default: EmptyView()
+            }
+        }
+        .padding(10)
+        .background(.regularMaterial)
+        .cornerRadius(10)
+        .padding(.horizontal)
+        .transition(.move(edge: .top).combined(with: .opacity))
+    }
+    
+    private func bottomEditToolbar(data: TextEditData) -> some View {
+        VStack(spacing: 0) {
+            Divider()
+            HStack(spacing: 12) {
+                // Delete Button
+                Button {
+                    isDiscarding = true
+                    textEditData = nil
+                } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.title2)
+                        .foregroundColor(.red)
+                }
+                
+                TextField("Enter text...", text: Binding(
+                    get: { data.newText },
+                    set: { textEditData?.newText = $0 }
+                ))
+                .textFieldStyle(.roundedBorder)
+                .focused($isInputFocused)
+                .submitLabel(.done)
+                
+                // Done Button
+                Button {
+                    isInputFocused = false
+                    // Commit changes (handled by textEditData binding updates)
+                    textEditData = nil // Exit edit mode for this box
+                } label: {
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.title2)
+                        .foregroundColor(.green)
+                }
+            }
+            .padding()
+            .background(Color(uiColor: .systemBackground))
+        }
+        .transition(.move(edge: .bottom))
+        .onAppear {
+            isInputFocused = true
+        }
+    }
+    
+    // MARK: - Logic, Scanning, etc (unchanged)
+    
     func setupDocument() {
         if let url = item.url {
             pdfDocument = PDFDocument(url: url)
@@ -424,8 +456,6 @@ struct FoxPDFViewer: View {
             }
         }
     }
-    
-    // MARK: - Logic
     
     func handleSelection(rect: CGRect, page: PDFPage) {
         // Called when user draws a new box
@@ -496,7 +526,7 @@ struct FoxPDFViewer: View {
                 return
             }
             
-            let text = observations.compactMap { $0.topCandidates(1).first?.string }.joined(separator: "\n")
+            let text = observations.compactMap { $0.topCandidates(1).first?.string }.joined(separator: String(UnicodeScalar(10)))
             
             var totalHeight: CGFloat = 0
             var count: CGFloat = 0

@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FoxioAI PDF Scanner - Support & Privacy</title>
+    <style>
+        :root {
+            --primary-color: #FF3B30; /* PDF Red */
+            --secondary-color: #007AFF;
+            --bg-color: #F2F2F7;
+            --card-bg: #FFFFFF;
+            --text-color: #1C1C1E;
+            --text-secondary: #8E8E93;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .header {
+            background-color: var(--card-bg);
+            padding: 40px 20px;
+            text-align: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+        }
+
+        .logo-container {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #FF3B30, #FF9500);
+            border-radius: 20px;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 36px;
+            box-shadow: 0 4px 12px rgba(255, 59, 48, 0.3);
+        }
+
+        /* Simple PDF Icon built with CSS */
+        .pdf-icon {
+            width: 40px;
+            height: 50px;
+            background-color: white;
+            border-radius: 4px;
+            position: relative;
+        }
+        .pdf-icon::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            border-bottom: 12px solid #ddd;
+            border-left: 12px solid white; 
+            border-right: 0; 
+            width: 0;
+        }
+        .pdf-icon::after {
+            content: 'PDF';
+            position: absolute;
+            bottom: 5px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            color: var(--primary-color);
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 28px;
+            color: #000;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            margin-top: 10px;
+            font-size: 18px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px;
+            flex: 1;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 22px;
+            color: var(--text-color);
+            border-bottom: 1px solid #eee;
+            padding-bottom: 12px;
+        }
+
+        .section-icon {
+            margin-right: 12px;
+            font-size: 24px;
+        }
+
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background-color: #F9F9F9;
+            border-radius: 12px;
+            transition: transform 0.2s;
+        }
+        
+        .contact-item:hover {
+            transform: translateY(-2px);
+            background-color: #F0F0F5;
+        }
+
+        .contact-label {
+            font-weight: 600;
+            min-width: 80px;
+            color: var(--text-secondary);
+        }
+
+        .contact-value {
+            color: var(--secondary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .contact-value:hover {
+            text-decoration: underline;
+        }
+
+        h3 {
+            color: #333;
+            margin-top: 25px;
+            font-size: 18px;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        @media (max-width: 600px) {
+            .header {
+                padding: 30px 20px;
+            }
+            .logo-container {
+                width: 60px;
+                height: 60px;
+            }
+            .pdf-icon {
+                transform: scale(0.8);
+            }
+            .card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="logo-container">
+            <div class="pdf-icon"></div>
+        </div>
+        <h1>FoxioAI PDF Scanner</h1>
+        <p class="subtitle">Scan, Sign, and Organize. Powered by AI.</p>
+    </header>
+
+    <div class="container">
+        
+        <!-- Contact Section -->
+        <div class="card">
+            <h2 class="section-title">
+                <span class="section-icon">📬</span> Contact Support
+            </h2>
+            <p>We are here to help! If you have any questions, suggestions, or need assistance, please reach out to us.</p>
+            
+            <div class="contact-info">
+                <div class="contact-item">
+                    <span class="contact-label">Email</span>
+                    <a href="mailto:developer@moonspace.work" class="contact-value">developer@moonspace.work</a>
+                </div>
+                <div class="contact-item">
+                    <span class="contact-label">Company</span>
+                    <span style="color: var(--text-color);">Shandong Junyou Information Technology Co., Ltd</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Privacy Policy Section -->
+        <div class="card">
+            <h2 class="section-title">
+                <span class="section-icon">🔒</span> Privacy Policy
+            </h2>
+            <p><strong>Last updated:</strong> December 7, 2025</p>
+
+            <h3>1. Introduction</h3>
+            <p>Shandong Junyou Information Technology Co., Ltd ("we," "our," or "us") respects your privacy. This Privacy Policy explains how <strong>FoxioAI PDF Scanner</strong> (the "App") handles your information.</p>
+
+            <h3>2. Data Collection and Usage</h3>
+            <ul>
+                <li><strong>Camera and Photos:</strong> The App requires access to your device's camera and photo library to scan documents and import images.</li>
+                <li><strong>Local Processing:</strong> <strong>All document scanning, OCR (text recognition), and processing are performed locally on your device.</strong> We do not upload your scanned documents to our servers. Your documents remain private and secure on your device.</li>
+                <li><strong>Advertising:</strong> We may use third-party advertising networks to display ads in the App. These networks may collect identifiers (such as the IDFA) to provide personalized advertisements relevant to you. You can control this tracking in your device settings.</li>
+            </ul>
+
+            <h3>3. Permissions</h3>
+            <p>The App requests the following permissions:</p>
+            <ul>
+                <li><strong>Camera:</strong> To capture images of documents.</li>
+                <li><strong>Photo Library:</strong> To save scanned documents or import images.</li>
+                <li><strong>Tracking:</strong> To deliver personalized advertising (optional).</li>
+            </ul>
+
+            <h3>4. Data Security</h3>
+            <p>We take reasonable measures to protect your information. Since document processing happens locally, the risk of data leakage during transmission is eliminated.</p>
+
+            <h3>5. Children's Privacy</h3>
+            <p>Our App is not intended for children under the age of 4. We do not knowingly collect personal information from children.</p>
+
+            <h3>6. Changes to This Policy</h3>
+            <p>We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page.</p>
+
+            <h3>7. Contact Us</h3>
+            <p>If you have any questions about this Privacy Policy, please contact us at: <a href="mailto:developer@moonspace.work" style="color: var(--secondary-color);">developer@moonspace.work</a></p>
+        </div>
+
+        <!-- Terms of Use Section -->
+        <div class="card" id="terms">
+            <h2 class="section-title">
+                <span class="section-icon">📜</span> Terms of Use (EULA)
+            </h2>
+            <p><strong>Last updated:</strong> December 9, 2025</p>
+
+            <h3>1. Agreement to Terms</h3>
+            <p>By downloading or using the FoxioAI PDF Scanner app, these terms will automatically apply to you – you should make sure therefore that you read them carefully before using the app.</p>
+
+            <h3>2. Subscriptions</h3>
+            <ul>
+                <li><strong>Payment:</strong> Payment will be charged to your iTunes Account at confirmation of purchase.</li>
+                <li><strong>Auto-Renewal:</strong> Subscription automatically renews unless auto-renew is turned off at least 24-hours before the end of the current period.</li>
+                <li><strong>Account Charged:</strong> Account will be charged for renewal within 24-hours prior to the end of the current period.</li>
+                <li><strong>Management:</strong> Subscriptions may be managed by the user and auto-renewal may be turned off by going to the user's Account Settings after purchase.</li>
+                <li><strong>Cancellation:</strong> Any unused portion of a free trial period, if offered, will be forfeited when the user purchases a subscription to that publication, where applicable.</li>
+            </ul>
+
+            <h3>3. Intellectual Property</h3>
+            <p>The app itself, and all the trade marks, copyright, database rights and other intellectual property rights related to it, still belong to Shandong Junyou Information Technology Co., Ltd.</p>
+
+            <h3>4. Changes to This Terms</h3>
+            <p>We may update our Terms and Conditions from time to time. Thus, you are advised to review this page periodically for any changes.</p>
+
+            <h3>5. Contact Us</h3>
+            <p>If you have any questions about these Terms, please contact us at: <a href="mailto:developer@moonspace.work" style="color: var(--secondary-color);">developer@moonspace.work</a></p>
+        </div>
+
+    </div>
+
+    <footer class="footer">
+        &copy; 2025 Shandong Junyou Information Technology Co., Ltd. All rights reserved.
+    </footer>
+
+</body>
+</html>

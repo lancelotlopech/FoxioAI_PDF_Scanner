@@ -43,6 +43,11 @@
 "Failed to create PDF from images." = "Failed to create PDF from images.";
 "No text recognized." = "No text recognized.";
 
+/* Dashboard Sections */
+"Essentials" = "Essentials";
+"Edit & Sign" = "Edit & Sign";
+"Security & AI" = "Security & AI";
+
 /* Import Types */
 "PDF Document" = "PDF Document";
 "Word Document" = "Word Document";
@@ -76,6 +81,10 @@
 "Terms of Use Placeholder" = "Terms of Use Placeholder";
 "Version" = "Version";
 "Mine" = "Mine";
+"Get Premium" = "Get Premium";
+"Unlock all features" = "Unlock all features";
+"Rate Us" = "Rate Us";
+"Share App" = "Share App";
 
 /* Main Tab */
 "Home" = "Home";
@@ -104,7 +113,6 @@
 "Unlimited Scans & Exports" = "Unlimited Scans & Exports";
 "Text Recognition (OCR)" = "Text Recognition (OCR)";
 "Sign & Protect Documents" = "Sign & Protect Documents";
-"Remove All Ads" = "Remove All Ads";
 "Free Trial Enabled" = "Free Trial Enabled";
 "Not sure yet? Enable free trial" = "Not sure yet? Enable free trial";
 "YEARLY ACCESS" = "YEARLY ACCESS";

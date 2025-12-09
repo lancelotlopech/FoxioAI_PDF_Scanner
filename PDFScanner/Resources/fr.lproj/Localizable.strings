@@ -43,6 +43,11 @@
 "Failed to create PDF from images." = "Échec de la création du PDF à partir des images.";
 "No text recognized." = "Aucun texte reconnu.";
 
+/* Dashboard Sections */
+"Essentials" = "Essentiels";
+"Edit & Sign" = "Éditer & Signer";
+"Security & AI" = "Sécurité & IA";
+
 /* Import Types */
 "PDF Document" = "Document PDF";
 "Word Document" = "Document Word";
@@ -76,6 +81,10 @@
 "Terms of Use Placeholder" = "Contenu des Conditions d'Utilisation";
 "Version" = "Version";
 "Mine" = "Moi";
+"Get Premium" = "Obtenir Premium";
+"Unlock all features" = "Débloquer toutes les fonctionnalités";
+"Rate Us" = "Notez-nous";
+"Share App" = "Partager l'App";
 
 /* Main Tab */
 "Home" = "Accueil";
@@ -104,7 +113,6 @@
 "Unlimited Scans & Exports" = "Scans & Exports Illimités";
 "Text Recognition (OCR)" = "Reconnaissance de Texte (OCR)";
 "Sign & Protect Documents" = "Signer & Protéger Documents";
-"Remove All Ads" = "Supprimer Pubs";
 "Free Trial Enabled" = "Essai Gratuit Activé";
 "Not sure yet? Enable free trial" = "Pas sûr ? Activer l'essai gratuit";
 "YEARLY ACCESS" = "ACCÈS ANNUEL";
@@ -144,7 +152,7 @@
 "Threats Found" = "Menaces Trouvées";
 "Scan Details" = "Détails du Scan";
 "Recommendations" = "Recommandations";
-"This document contains active content (scripts or actions). Only open it if you trust the source completely. Consider converting it to images to neutralize threats." = "Ce document contient du contenu actif (scripts ou actions). Ne l'ouvrez que si vous faites entièrement confiance à la source. Envisagez de le convertir en images pour neutraliser les menaces.";
+"This document contains active content (scripts or actions). Only open it if you trust the source completely. Consider converting it to images to neutralize threats." = "Ce document contient du contenu actif (scripts or actions). Ne l'ouvrez que si vous faites entièrement confiance à la source. Envisagez de le convertir en images pour neutraliser les menaces.";
 "Size" = "Taille";
 "Space" = "Espace";
 "Changes saved successfully." = "Modifications enregistrées avec succès.";

@@ -18,23 +18,30 @@ struct SettingsView: View {
                             VStack(alignment: .leading, spacing: 8) {
                                 HStack {
                                     Image(systemName: "crown.fill")
-                                        .foregroundStyle(.primary)
+                                        .foregroundStyle(.white)
                                         .font(.title2)
                                     Text("Get Premium")
                                         .font(.title3.bold())
-                                        .foregroundStyle(.primary)
+                                        .foregroundStyle(.white)
                                     Spacer()
                                     Image(systemName: "chevron.right")
-                                        .foregroundStyle(.secondary)
+                                        .foregroundStyle(.white.opacity(0.8))
                                 }
-                                Text("Unlock all features & remove ads")
+                                Text("Unlock all features")
                                     .font(.subheadline)
-                                    .foregroundStyle(.secondary)
+                                    .foregroundStyle(.white.opacity(0.9))
                             }
                             .padding(.vertical, 8)
                         }
                         .listRowBackground(
-                            Color(red: 1.0, green: 0.95, blue: 0.8) // Very Light Yellow/Cream
+                            LinearGradient(
+                                colors: [
+                                    Color(red: 0.9, green: 0.2, blue: 0.4), // Deeper Pink
+                                    Color(red: 0.9, green: 0.5, blue: 0.1)  // Deeper Orange
+                                ],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
                         )
                     }
                 }
@@ -53,11 +60,13 @@ struct SettingsView: View {
                     }
                     .foregroundStyle(.primary)
                     
-                    // Placeholder URL for App Store
+                    /*
+                    // Placeholder URL for App Store - Hidden for submission until App ID is available
                     ShareLink(item: URL(string: "https://apps.apple.com")!) {
                         SettingsRow(icon: "square.and.arrow.up.fill", color: .green, title: "Share App")
                     }
                     .foregroundStyle(.primary)
+                    */
                 }
                 
                 // About Section

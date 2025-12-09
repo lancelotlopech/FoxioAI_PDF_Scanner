@@ -32,6 +32,7 @@ struct ScannerView: UIViewControllerRepresentable {
                 let image = scan.imageOfPage(at: pageIndex)
                 scannedImages.append(image)
             }
+            
             parent.didFinishScanning(.success(scannedImages))
         }
         
