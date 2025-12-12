@@ -12,6 +12,9 @@ class SubscriptionManager: ObservableObject {
     @Published var isLoading = false
     @Published var errorMessage: String?
     
+    private let debugVipKey = "debug_vip_expiry"
+    private let cachedPremiumKey = "cached_is_premium"
+    
     // Feature Enums
     enum Feature {
         case ocr
@@ -28,6 +31,14 @@ class SubscriptionManager: ObservableObject {
     private var updates: Task<Void, Never>? = nil
     
     private init() {
+        // Initialize with cached status immediately to prevent UI flickering
+        self.isPremium = UserDefaults.standard.bool(forKey: cachedPremiumKey)
+        
+        // Also check Debug VIP status synchronously
+        if !self.isPremium {
+            self.isPremium = checkDebugVipStatus()
+        }
+        
         // Start listening for transaction updates (e.g. renewals, external purchases)
         updates = newTransactionListenerTask()
         
@@ -36,6 +47,31 @@ class SubscriptionManager: ObservableObject {
             await updateSubscriptionStatus()
             // In a real app, you would call this. For UI dev, we might verify mock data.
             // await requestProducts()
+        }
+    }
+    
+    // MARK: - Debug / Testing
+    
+    func activateDebugVip() {
+        // Grant 7 days of VIP
+        let expiryDate = Date().addingTimeInterval(7 * 24 * 3600)
+        UserDefaults.standard.set(expiryDate, forKey: debugVipKey)
+        Task {
+            await updateSubscriptionStatus()
+        }
+    }
+    
+    private func checkDebugVipStatus() -> Bool {
+        guard let expiryDate = UserDefaults.standard.object(forKey: debugVipKey) as? Date else {
+            return false
+        }
+        
+        if Date() < expiryDate {
+            return true
+        } else {
+            // Expired, clean up
+            UserDefaults.standard.removeObject(forKey: debugVipKey)
+            return false
         }
     }
     
@@ -96,7 +132,7 @@ class SubscriptionManager: ObservableObject {
     func updateSubscriptionStatus() async {
         var hasActiveSubscription = false
         
-        // Iterate through all of the user's purchased products
+        // 1. Check App Store Entitlements
         for await result in Transaction.currentEntitlements {
             do {
                 // Check if the transaction is verified
@@ -111,7 +147,15 @@ class SubscriptionManager: ObservableObject {
             }
         }
         
+        // 2. Check Debug VIP (Local Whitelist)
+        if !hasActiveSubscription {
+            hasActiveSubscription = checkDebugVipStatus()
+        }
+        
         self.isPremium = hasActiveSubscription
+        
+        // Cache the status for next launch
+        UserDefaults.standard.set(hasActiveSubscription, forKey: cachedPremiumKey)
     }
     
     private func newTransactionListenerTask() -> Task<Void, Never> {

@@ -352,7 +352,9 @@ struct DashboardView: View {
             Spacer()
             
             Button {
-                isShowingSubscription = true
+                if !subscriptionManager.isPremium {
+                    isShowingSubscription = true
+                }
             } label: {
                 HStack(spacing: 6) {
                     Image(systemName: "crown.fill")
@@ -375,7 +377,9 @@ struct DashboardView: View {
                 )
                 .clipShape(Capsule())
                 .shadow(color: Color(red: 0.9, green: 0.2, blue: 0.4).opacity(0.3), radius: 4, x: 0, y: 2)
+                .opacity(subscriptionManager.isPremium ? 0 : 1) // Hide if premium, but keep layout
             }
+            .disabled(subscriptionManager.isPremium) // Disable interaction if premium
         }
         .padding(.top, 8)
     }

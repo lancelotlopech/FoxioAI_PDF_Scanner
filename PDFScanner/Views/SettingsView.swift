@@ -3,12 +3,16 @@ import StoreKit
 
 struct SettingsView: View {
     @ObservedObject var subscriptionManager = SubscriptionManager.shared
+    @ObservedObject var ratingManager = RatingManager.shared
     @State private var showSubscription = false
+    @State private var showFeedback = false
+    @State private var showDebugAlert = false
     @Environment(\.requestReview) var requestReview
     
     var body: some View {
-        NavigationStack {
-            List {
+        ZStack {
+            NavigationStack {
+                List {
                 // VIP Banner Section
                 if !subscriptionManager.isPremium {
                     Section {
@@ -48,13 +52,15 @@ struct SettingsView: View {
                 
                 // Support Section
                 Section("Support") {
-                    Link(destination: URL(string: "mailto:developer@moonspace.work")!) {
+                    Button {
+                        showFeedback = true
+                    } label: {
                         SettingsRow(icon: "bubble.left.and.bubble.right.fill", color: .blue, title: "Give Feedback")
                     }
                     .foregroundStyle(.primary)
                     
                     Button {
-                        requestReview()
+                        ratingManager.showRating()
                     } label: {
                         SettingsRow(icon: "star.fill", color: Color(red: 1.0, green: 0.84, blue: 0.0), title: "Rate Us")
                     }
@@ -89,6 +95,12 @@ struct SettingsView: View {
                         Spacer()
                         Text("1.0.0")
                             .foregroundStyle(.secondary)
+                            .contentShape(Rectangle()) // Ensure tap area is large enough
+                            .onTapGesture(count: 8) {
+                                print("Debug VIP Activated") // Debug log
+                                subscriptionManager.activateDebugVip()
+                                showDebugAlert = true
+                            }
                     }
                 }
             }
@@ -96,6 +108,21 @@ struct SettingsView: View {
             .listStyle(.insetGrouped)
             .fullScreenCover(isPresented: $showSubscription) {
                 SubscriptionView()
+            }
+            .sheet(isPresented: $showFeedback) {
+                FeedbackView()
+            }
+            .alert("Debug Mode", isPresented: $showDebugAlert) {
+                Button("OK", role: .cancel) { }
+            } message: {
+                Text("You have activated 7 days of VIP access for testing.")
+            }
+            }
+            
+            if ratingManager.showRatingPopup {
+                RatingPopupView(isPresented: $ratingManager.showRatingPopup)
+                    .transition(.opacity)
+                    .zIndex(100)
             }
         }
     }

@@ -20,10 +20,19 @@ struct SplashView: View {
                     Spacer()
                     
                     // Centered Image (Fox)
-                    Image("LoadingImage")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: 240, height: 240) // Adjusted size for visibility
+                    // Use system image as fallback if asset is missing to prevent blank screen
+                    if let _ = UIImage(named: "LoadingImage") {
+                        Image("LoadingImage")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 240, height: 240)
+                    } else {
+                        Image(systemName: "doc.viewfinder")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 120, height: 120)
+                            .foregroundStyle(.orange)
+                    }
                     
                     Spacer()
                     

@@ -2,6 +2,7 @@ import Foundation
 import PDFKit
 import UIKit
 import WebKit
+import CoreImage.CIFilterBuiltins
 
 struct SecurityScanResult {
     let isSafe: Bool
@@ -43,6 +44,223 @@ class FoxPDFManager {
         } catch {
             print("Error saving PDF: \(error)")
             return nil
+        }
+    }
+    
+    // MARK: - Watermark Logic
+    
+    func generateQRCode(from string: String) -> UIImage? {
+        let context = CIContext()
+        let filter = CIFilter.qrCodeGenerator()
+        filter.message = Data(string.utf8)
+        
+        if let outputImage = filter.outputImage {
+            // Scale up the QR code to be sharp
+            let transform = CGAffineTransform(scaleX: 10, y: 10)
+            let scaledImage = outputImage.transformed(by: transform)
+            
+            if let cgImage = context.createCGImage(scaledImage, from: scaledImage.extent) {
+                return UIImage(cgImage: cgImage)
+            }
+        }
+        return nil
+    }
+    
+    func createWatermarkedPDF(from url: URL) -> URL? {
+        guard let document = PDFDocument(url: url) else { return nil }
+        
+        let pdfData = NSMutableData()
+        UIGraphicsBeginPDFContextToData(pdfData, .zero, nil)
+        
+        let qrCodeImage = generateQRCode(from: "https://apps.apple.com/app/id6756200466")
+        
+        for i in 0..<document.pageCount {
+            guard let page = document.page(at: i) else { continue }
+            
+            let pageBounds = page.bounds(for: .mediaBox)
+            let rotation = page.rotation
+            
+            // Determine visual dimensions
+            let isLandscape = (rotation == 90 || rotation == 270)
+            let visualWidth = isLandscape ? pageBounds.height : pageBounds.width
+            let visualHeight = isLandscape ? pageBounds.width : pageBounds.height
+            
+            // Add extra height for footer to avoid covering content
+            let footerHeight: CGFloat = 80
+            let totalHeight = visualHeight + footerHeight
+            
+            let newBounds = CGRect(x: 0, y: 0, width: visualWidth, height: totalHeight)
+            
+            UIGraphicsBeginPDFPageWithInfo(newBounds, nil)
+            
+            guard let context = UIGraphicsGetCurrentContext() else { continue }
+            
+            // 1. Draw Original Page (Top Section)
+            context.saveGState()
+            
+            // CRITICAL FIX: Force Coordinate Flip
+            // We want to draw the page content in the top part: (0, 0) to (visualWidth, visualHeight)
+            // In our flipped coordinate system (Top-Left 0,0), this is naturally at the top.
+            
+            // Flip Y axis to match UIKit coordinates (Top-Left 0,0)
+            // Note: We translate by totalHeight because that's the full page height now.
+            context.translateBy(x: 0.0, y: totalHeight)
+            context.scaleBy(x: 1.0, y: -1.0)
+            
+            // Now (0,0) is Top-Left.
+            // We want to draw the page content.
+            // Since we increased the page height, we need to decide where to put the content.
+            // We want it at the TOP.
+            // In Top-Left coords, Top is Y=0.
+            
+            // Handle rotation manually
+            switch rotation {
+            case 0:
+                context.translateBy(x: 0, y: 0)
+            case 90:
+                context.rotate(by: -.pi / 2)
+                context.translateBy(x: -visualHeight, y: 0)
+            case 180:
+                context.rotate(by: .pi)
+                context.translateBy(x: -visualWidth, y: -visualHeight)
+            case 270:
+                context.rotate(by: .pi / 2)
+                context.translateBy(x: 0, y: -visualWidth)
+            default:
+                break
+            }
+            
+            page.draw(with: .mediaBox, to: context)
+            context.restoreGState()
+            
+            // 2. Draw Watermark (Footer Section)
+            // We draw this in the standard PDF coordinate system (Bottom-Left 0,0)
+            // because we restored the GState.
+            // In PDF coords (Bottom-Left 0,0), the "Bottom" of our visual page is actually Y=0.
+            // Since we extended the height, the "Footer" is the bottom-most part, which is Y=0 to Y=footerHeight.
+            // The original content is above it, from Y=footerHeight to Y=totalHeight.
+            
+            // Wait, let's double check the flip logic above.
+            // We did: translate(0, totalHeight) then scale(1, -1).
+            // This maps PDF(0,0) [Bottom-Left] to UIKit(0, totalHeight) [Visual Bottom].
+            // And PDF(0, totalHeight) [Top-Left] to UIKit(0, 0) [Visual Top].
+            
+            // So if we draw the page at (0,0) in the flipped context, it appears at the Visual Top. Correct.
+            
+            // 2. Draw Watermark (Footer Section)
+            // We need to be careful about coordinates.
+            // We restored GState, so we are back to the PDF Context's default coordinate system.
+            // BUT, UIGraphicsBeginPDFPageWithInfo creates a context where (0,0) is Bottom-Left.
+            
+            // However, we observed that drawing at (0,0) resulted in the watermark being at the TOP.
+            // This implies that despite our manual flip for the page content, the context itself might
+            // be behaving differently than standard PDF coords, OR our understanding of "Visual Top" was inverted.
+            
+            // If (0,0) resulted in Top, then the coordinate system is likely Top-Left (0,0) by default in this context
+            // (which is standard for UIGraphics contexts, even PDF ones, on iOS).
+            // If so, Y increases downwards.
+            
+            // If (0,0) is Top, then to draw at the Bottom, we need Y = totalHeight - footerHeight.
+            
+            context.saveGState()
+            
+            // Draw at the bottom
+            let footerY = totalHeight - footerHeight
+            let footerRect = CGRect(x: 0, y: footerY, width: visualWidth, height: footerHeight)
+            
+            // White background for footer
+            UIColor.white.setFill()
+            context.fill(footerRect)
+            
+            // Separator line (at the top of the footer)
+            let linePath = UIBezierPath()
+            linePath.move(to: CGPoint(x: 0, y: footerY))
+            linePath.addLine(to: CGPoint(x: visualWidth, y: footerY))
+            linePath.lineWidth = 1
+            UIColor.lightGray.withAlphaComponent(0.3).setStroke()
+            linePath.stroke()
+            
+            // Text
+            let text = "Scan & Edit with FoxioAI"
+            let font = UIFont.systemFont(ofSize: 16, weight: .bold)
+            let attributes: [NSAttributedString.Key: Any] = [
+                .font: font,
+                .foregroundColor: UIColor.gray
+            ]
+            let attributedText = NSAttributedString(string: text, attributes: attributes)
+            let textSize = attributedText.size()
+            
+            let textX = (visualWidth - textSize.width) / 2
+            let textY = footerY + (footerHeight - textSize.height) / 2
+            attributedText.draw(at: CGPoint(x: textX, y: textY))
+            
+            // QR Code
+            if let qr = qrCodeImage {
+                let qrSize: CGFloat = 44
+                let qrX = visualWidth - qrSize - 20
+                let qrY = footerY + (footerHeight - qrSize) / 2
+                qr.draw(in: CGRect(x: qrX, y: qrY, width: qrSize, height: qrSize))
+            }
+            
+            context.restoreGState()
+        }
+        
+        UIGraphicsEndPDFContext()
+        
+        let tempDir = FileManager.default.temporaryDirectory
+        let tempURL = tempDir.appendingPathComponent("FoxioAI_Export_\(Int(Date().timeIntervalSince1970)).pdf")
+        
+        do {
+            try pdfData.write(to: tempURL, options: .atomic)
+            return tempURL
+        } catch {
+            print("Failed to save watermarked PDF: \(error)")
+            return nil
+        }
+    }
+    
+    func createWatermarkedImage(from image: UIImage) -> UIImage? {
+        let qrCodeImage = generateQRCode(from: "https://apps.apple.com/app/id6756200466")
+        let footerHeight: CGFloat = 80 // Increased footer height for images
+        
+        let newSize = CGSize(width: image.size.width, height: image.size.height + footerHeight)
+        
+        let renderer = UIGraphicsImageRenderer(size: newSize)
+        return renderer.image { ctx in
+            // Fill background
+            UIColor.white.set()
+            ctx.fill(CGRect(origin: .zero, size: newSize))
+            
+            // Draw Original Image at top
+            image.draw(in: CGRect(x: 0, y: 0, width: image.size.width, height: image.size.height))
+            
+            // Draw Footer Content
+            // Note: In UIGraphicsImageRenderer (UIKit), (0,0) is Top-Left.
+            // So footer is at y = image.height
+            
+            let footerRect = CGRect(x: 0, y: image.size.height, width: image.size.width, height: footerHeight)
+            
+            // Text
+            let text = "Scan & Edit with FoxioAI"
+            let font = UIFont.systemFont(ofSize: 32, weight: .bold) // Much larger font for high-res images
+            let attributes: [NSAttributedString.Key: Any] = [
+                .font: font,
+                .foregroundColor: UIColor.gray
+            ]
+            let attributedText = NSAttributedString(string: text, attributes: attributes)
+            let textSize = attributedText.size()
+            
+            let textX = (image.size.width - textSize.width) / 2
+            let textY = image.size.height + (footerHeight - textSize.height) / 2
+            attributedText.draw(at: CGPoint(x: textX, y: textY))
+            
+            // QR Code
+            if let qr = qrCodeImage {
+                let qrSize: CGFloat = 60 // Larger QR code
+                let qrX = image.size.width - qrSize - 40
+                let qrY = image.size.height + (footerHeight - qrSize) / 2
+                qr.draw(in: CGRect(x: qrX, y: qrY, width: qrSize, height: qrSize))
+            }
         }
     }
     
@@ -175,19 +393,27 @@ class FoxPDFManager {
         // 1. Check Encryption
         if let document = PDFDocument(url: url) {
             if document.isLocked {
-                details += "• Document is encrypted (Good for privacy).\n"
+                details += """
+• Document is encrypted (Good for privacy).
+"""
             } else {
-                details += "• Document is not encrypted.\n"
+                details += """
+• Document is not encrypted.
+"""
                 // Not a threat, but a note
             }
             
             // 2. Check Metadata
             if let attributes = document.documentAttributes {
                 if let author = attributes[PDFDocumentAttribute.authorAttribute] as? String {
-                    details += "• Author: \(author)\n"
+                    details += """
+• Author: \(author)
+"""
                 }
                 if let creator = attributes[PDFDocumentAttribute.creatorAttribute] as? String {
-                    details += "• Creator: \(creator)\n"
+                    details += """
+• Creator: \(creator)
+"""
                 }
             }
         }
@@ -206,37 +432,52 @@ class FoxPDFManager {
                 if let content = String(data: data, encoding: .ascii) {
                     if content.contains("/JavaScript") || content.contains("/JS") {
                         threats.append("Contains JavaScript")
-                        details += "⚠️ Found embedded JavaScript. This can be used for malicious actions.\n"
+                        details += """
+⚠️ Found embedded JavaScript. This can be used for malicious actions.
+"""
                         score -= 30
                     }
                     
                     if content.contains("/OpenAction") || content.contains("/AA") {
                         threats.append("Auto-Run Actions")
-                        details += "⚠️ Found Auto-Run Actions. The document may execute commands upon opening.\n"
+                        details += """
+⚠️ Found Auto-Run Actions. The document may execute commands upon opening.
+"""
                         score -= 20
                     }
                     
                     if content.contains("/Launch") {
                         threats.append("Launch Command")
-                        details += "⚠️ Found Launch Command. The document may try to open external applications.\n"
+                        details += """
+⚠️ Found Launch Command. The document may try to open external applications.
+"""
                         score -= 40
                     }
                     
                     if content.contains("/URI") {
-                        details += "ℹ️ Contains External Links.\n"
+                        details += """
+ℹ️ Contains External Links.
+"""
                     }
                 }
             } else {
-                details += "• File too large for deep script scanning.\n"
+                details += """
+• File too large for deep script scanning.
+"""
             }
             
         } catch {
             print("Failed to read file for scanning: \(error)")
-            details += "• Could not perform deep scan.\n"
+            details += """
+• Could not perform deep scan.
+"""
         }
         
         if threats.isEmpty {
-            details += "\n✅ No active threats detected."
+            details += """
+
+✅ No active threats detected.
+"""
         }
         
         return SecurityScanResult(isSafe: threats.isEmpty, threats: threats, details: details, score: score)

@@ -36,6 +36,45 @@ enum StyleTool: String, CaseIterable {
     case background = "square.dashed"
 }
 
+enum AnnotationTool: String, CaseIterable, Identifiable {
+    case pen = "scribble"
+    case highlight = "highlighter"
+    case rectangle = "rectangle"
+    case arrow = "arrow.up.right"
+    
+    var id: String { rawValue }
+}
+
+enum AnnotationColor: String, CaseIterable, Identifiable {
+    case red = "Red"
+    case yellow = "Yellow"
+    case blue = "Blue"
+    case green = "Green"
+    case black = "Black"
+    
+    var id: String { rawValue }
+    
+    var uiColor: UIColor {
+        switch self {
+        case .red: return .red
+        case .yellow: return .yellow
+        case .blue: return .blue
+        case .green: return .green
+        case .black: return .black
+        }
+    }
+    
+    var color: Color {
+        switch self {
+        case .red: return .red
+        case .yellow: return .yellow
+        case .blue: return .blue
+        case .green: return .green
+        case .black: return .black
+        }
+    }
+}
+
 // MARK: - Main View
 
 struct FoxPDFViewer: View {
@@ -53,6 +92,7 @@ struct FoxPDFViewer: View {
     @State private var isShowingDiscardAlert = false
     @State private var isShowingSignInstructionAlert = false
     @State private var isShowingEditInstruction = false
+    @State private var isShowingExportOptions = false
     @State private var pdfView = PDFView()
     
     // Data-driven presentation
@@ -66,6 +106,11 @@ struct FoxPDFViewer: View {
     @State private var activeStyleTool: StyleTool?
     @State private var isDiscarding = false // Flag to discard changes on exit
     @FocusState private var isInputFocused: Bool
+    
+    // Annotation Mode State
+    @State private var isAnnotationMode = false
+    @State private var activeAnnotationTool: AnnotationTool? = .pen
+    @State private var activeAnnotationColor: AnnotationColor = .red
     
     // Scanning Effect State
     @State private var isScanning = false
@@ -84,6 +129,8 @@ struct FoxPDFViewer: View {
                     if let tool = activeStyleTool, let data = textEditData {
                         editModeSliderOverlay(tool: tool, data: data)
                     }
+                } else if isAnnotationMode {
+                    annotationModeTopBar
                 }
                 
                 ZStack(alignment: .bottom) {
@@ -92,6 +139,9 @@ struct FoxPDFViewer: View {
                         url: item.url,
                         isEditMode: $isEditMode,
                         isDrawMode: $isDrawMode,
+                        isAnnotationMode: $isAnnotationMode,
+                        activeAnnotationTool: $activeAnnotationTool,
+                        activeAnnotationColor: $activeAnnotationColor,
                         textEditData: $textEditData,
                         isDiscarding: $isDiscarding,
                         onSelection: handleSelection,
@@ -130,14 +180,26 @@ struct FoxPDFViewer: View {
                     isShowingPageEditor = true
                 }
             }
+            
+            // Try to show rating popup (passive trigger)
+            // Delay to avoid interrupting immediate user actions
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                RatingManager.shared.tryShowRating()
+            }
         }
-        .navigationTitle(isEditMode ? "" : item.name)
+        .navigationTitle((isEditMode || isAnnotationMode) ? "" : item.name)
         .navigationBarTitleDisplayMode(.inline)
-        .navigationBarHidden(isEditMode)
+        .navigationBarHidden(isEditMode || isAnnotationMode)
         .toolbar {
-            if !isEditMode {
+            if !isEditMode && !isAnnotationMode {
                 ToolbarItem(placement: .primaryAction) {
                     HStack {
+                        Button {
+                            isAnnotationMode = true
+                        } label: {
+                            Label("Annotate", systemImage: "pencil.tip.crop.circle")
+                        }
+                        
                         Button {
                             if SubscriptionManager.shared.checkAccess(for: .ocr) {
                                 startScanningEffect()
@@ -174,7 +236,9 @@ struct FoxPDFViewer: View {
                 
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {
-                        ShareLink(item: item.url!) {
+                        Button {
+                            isShowingExportOptions = true
+                        } label: {
                             Label(String(localized: "Share PDF"), systemImage: "square.and.arrow.up")
                         }
                         
@@ -215,6 +279,9 @@ struct FoxPDFViewer: View {
             if let document = pdfDocument ?? pdfView.document ?? (item.url != nil ? PDFDocument(url: item.url!) : nil) {
                 PDFPageEditorView(document: document)
             }
+        }
+        .sheet(isPresented: $isShowingExportOptions) {
+            ExportOptionsView(item: item, isPresented: $isShowingExportOptions)
         }
         .sheet(isPresented: $isShowingSignatureCanvas, onDismiss: {
             if let data = tempPlacementData {
@@ -346,6 +413,71 @@ struct FoxPDFViewer: View {
         .padding(.vertical, 8)
         .background(Color(uiColor: .systemBackground))
         .shadow(radius: 1)
+    }
+    
+    private var annotationModeTopBar: some View {
+        VStack(spacing: 0) {
+            HStack(spacing: 12) {
+                Button("Done") {
+                    isAnnotationMode = false
+                    saveChanges()
+                }
+                .fontWeight(.bold)
+                .font(.subheadline)
+                .fixedSize() // Prevent compression
+                
+                Spacer()
+                
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 20) {
+                        // Tools
+                        HStack(spacing: 12) {
+                            ForEach(AnnotationTool.allCases) { tool in
+                                Button {
+                                    if activeAnnotationTool == tool {
+                                        activeAnnotationTool = nil // Deselect
+                                    } else {
+                                        activeAnnotationTool = tool
+                                    }
+                                } label: {
+                                    Image(systemName: tool.rawValue)
+                                        .font(.system(size: 18))
+                                        .foregroundColor(activeAnnotationTool == tool ? .blue : .primary)
+                                        .padding(8)
+                                        .background(activeAnnotationTool == tool ? Color.blue.opacity(0.1) : Color.clear)
+                                        .cornerRadius(8)
+                                }
+                            }
+                        }
+                        
+                        Divider()
+                            .frame(height: 20)
+                        
+                        // Colors
+                        HStack(spacing: 12) {
+                            ForEach(AnnotationColor.allCases) { color in
+                                Button {
+                                    activeAnnotationColor = color
+                                } label: {
+                                    Circle()
+                                        .fill(color.color)
+                                        .frame(width: 24, height: 24)
+                                        .overlay(
+                                            Circle()
+                                                .stroke(Color.gray, lineWidth: activeAnnotationColor == color ? 2 : 0)
+                                        )
+                                }
+                            }
+                        }
+                    }
+                    .padding(.horizontal, 4)
+                }
+            }
+            .padding(.horizontal)
+            .padding(.vertical, 8)
+            .background(Color(uiColor: .systemBackground))
+            .shadow(radius: 1)
+        }
     }
     
     private func editModeSliderOverlay(tool: StyleTool, data: TextEditData) -> some View {
@@ -610,6 +742,10 @@ struct FoxPDFViewer: View {
     
     func saveToPhotos() {
         guard let document = pdfView.document else { return }
+        
+        // Check if watermark is needed (Not Premium)
+        let needsWatermark = !SubscriptionManager.shared.isPremium
+        
         for i in 0..<document.pageCount {
             if let page = document.page(at: i) {
                 let pageBounds = page.bounds(for: .mediaBox)
@@ -621,7 +757,16 @@ struct FoxPDFViewer: View {
                     ctx.cgContext.scaleBy(x: 1.0, y: -1.0)
                     page.draw(with: .mediaBox, to: ctx.cgContext)
                 }
-                UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
+                
+                if needsWatermark {
+                    if let watermarkedImage = FoxPDFManager.shared.createWatermarkedImage(from: image) {
+                        UIImageWriteToSavedPhotosAlbum(watermarkedImage, nil, nil, nil)
+                    } else {
+                        UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
+                    }
+                } else {
+                    UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
+                }
             }
         }
         isShowingSaveAlert = true
@@ -629,12 +774,23 @@ struct FoxPDFViewer: View {
     
     func printPDF() {
         guard let url = item.url else { return }
+        
+        // Check if watermark is needed (Not Premium)
+        let needsWatermark = !SubscriptionManager.shared.isPremium
+        
+        var printURL = url
+        if needsWatermark {
+            if let watermarkedURL = FoxPDFManager.shared.createWatermarkedPDF(from: url) {
+                printURL = watermarkedURL
+            }
+        }
+        
         let printController = UIPrintInteractionController.shared
         let printInfo = UIPrintInfo(dictionary: nil)
         printInfo.outputType = .general
         printInfo.jobName = item.name
         printController.printInfo = printInfo
-        printController.printingItem = url
+        printController.printingItem = printURL
         printController.present(animated: true, completionHandler: nil)
     }
 }
@@ -646,6 +802,9 @@ struct PDFKitRepresentedView: UIViewRepresentable {
     var url: URL?
     @Binding var isEditMode: Bool
     @Binding var isDrawMode: Bool
+    @Binding var isAnnotationMode: Bool
+    @Binding var activeAnnotationTool: AnnotationTool?
+    @Binding var activeAnnotationColor: AnnotationColor
     @Binding var textEditData: TextEditData?
     @Binding var isDiscarding: Bool
     
@@ -711,11 +870,16 @@ struct PDFKitRepresentedView: UIViewRepresentable {
             let pdfView = parent.pdfView
             
             // Strict Mode Switching via Overlay
-            let isDrawing = parent.isDrawMode && parent.textEditData == nil
+            // Enable overlay if we are drawing a box (Edit Mode) OR annotating (Annotation Mode)
+            let isDrawingBox = parent.isEditMode && parent.isDrawMode && parent.textEditData == nil
+            // Only enable overlay for annotation if a tool is actually selected
+            let isAnnotating = parent.isAnnotationMode && parent.activeAnnotationTool != nil
+            
+            let shouldEnableOverlay = isDrawingBox || isAnnotating
             
             // 1. Toggle Overlay Visibility
-            drawingOverlay?.isHidden = !isDrawing
-            drawingOverlay?.isUserInteractionEnabled = isDrawing
+            drawingOverlay?.isHidden = !shouldEnableOverlay
+            drawingOverlay?.isUserInteractionEnabled = shouldEnableOverlay
             if let overlay = drawingOverlay {
                 pdfView.bringSubviewToFront(overlay)
             }
@@ -868,10 +1032,180 @@ struct PDFKitRepresentedView: UIViewRepresentable {
             }
         }
         
+        // Annotation State
+        var currentAnnotationPath: UIBezierPath?
+        var currentAnnotationLayer: CAShapeLayer?
+        
         @objc func handlePan(_ gesture: UIPanGestureRecognizer) {
-            // Drawing logic (Happens on Overlay)
             let location = gesture.location(in: parent.pdfView)
             
+            if parent.isAnnotationMode {
+                handleAnnotationPan_Refined(gesture, location: location)
+            } else {
+                handleSelectionPan(gesture, location: location)
+            }
+        }
+        
+        // Refined Annotation Logic with Point Storage
+        var annotationPoints: [CGPoint] = []
+        var annotationStartPoint: CGPoint = .zero
+        
+        func handleAnnotationPan_Refined(_ gesture: UIPanGestureRecognizer, location: CGPoint) {
+             guard let page = parent.pdfView.page(for: location, nearest: true) else { return }
+             let pagePoint = parent.pdfView.convert(location, to: page)
+             
+             switch gesture.state {
+             case .began:
+                 annotationPoints = [pagePoint]
+                 annotationStartPoint = location
+                 
+                 let layer = CAShapeLayer()
+                 layer.strokeColor = parent.activeAnnotationColor.uiColor.cgColor
+                 layer.fillColor = nil
+                 
+                 // Dynamic Line Width based on Zoom Scale
+                 // We want the visual width on screen to be constant (e.g. 3pt),
+                 // so we divide by scaleFactor? No, we are drawing on the PDFView's layer (screen coordinates).
+                 // Wait, we are adding sublayer to pdfView.layer.
+                 // If we draw with 3pt on screen, it looks 3pt.
+                 // But when we save to PDF, we use PDF coordinates.
+                 // The issue is the mismatch between preview width and final PDF annotation width.
+                 // Final PDF Annotation width is in PDF Points.
+                 // If PDF is zoomed out (scale < 1), 3 PDF points is small on screen.
+                 // If PDF is zoomed in (scale > 1), 3 PDF points is large on screen.
+                 // The user says: "Preview is thick, but when released it gets thin".
+                 // This means Preview (Screen Points) > Final (PDF Points * Scale).
+                 // To match, we should make the Preview width match what the Final width will look like.
+                 // Final Width (Screen) = PDF_LineWidth * ScaleFactor.
+                 // So Preview LineWidth should be PDF_LineWidth * ScaleFactor.
+                 
+                 let pdfLineWidth: CGFloat = parent.activeAnnotationTool == .highlight ? 20 : 3
+                 let currentScale = parent.pdfView.scaleFactor
+                 layer.lineWidth = pdfLineWidth * currentScale
+                 
+                 layer.opacity = parent.activeAnnotationTool == .highlight ? 0.3 : 1.0
+                 layer.lineCap = .round
+                 layer.lineJoin = .round
+                 parent.pdfView.layer.addSublayer(layer)
+                 currentAnnotationLayer = layer
+                 
+             case .changed:
+                 annotationPoints.append(pagePoint)
+                 
+                 guard let layer = currentAnnotationLayer else { return }
+                 let path = UIBezierPath()
+                 
+                 if parent.activeAnnotationTool == .rectangle {
+                     let rect = CGRect(x: min(annotationStartPoint.x, location.x),
+                                       y: min(annotationStartPoint.y, location.y),
+                                       width: abs(location.x - annotationStartPoint.x),
+                                       height: abs(location.y - annotationStartPoint.y))
+                     path.append(UIBezierPath(rect: rect))
+                 } else if parent.activeAnnotationTool == .arrow {
+                     path.move(to: annotationStartPoint)
+                     path.addLine(to: location)
+                 } else {
+                     // Freehand
+                     path.move(to: annotationStartPoint)
+                     // We need to convert all page points back to view for preview? 
+                     // No, just append current location for preview is enough for smooth drawing
+                     // But for preview consistency, let's just draw from start to current
+                     // For freehand, we need to accumulate view points too.
+                     // Let's just use the gesture location for preview.
+                     if let currentPath = currentAnnotationPath {
+                         currentPath.addLine(to: location)
+                         layer.path = currentPath.cgPath
+                         return
+                     }
+                     currentAnnotationPath = UIBezierPath()
+                     currentAnnotationPath?.move(to: annotationStartPoint)
+                     currentAnnotationPath?.addLine(to: location)
+                     layer.path = currentAnnotationPath?.cgPath
+                 }
+                 layer.path = path.cgPath
+                 
+             case .ended:
+                 guard let layer = currentAnnotationLayer else { return }
+                 
+                 // Create Final Annotation
+                 let color = parent.activeAnnotationColor.uiColor
+                 
+                 switch parent.activeAnnotationTool {
+                 case .none: break
+                 case .pen, .highlight:
+                     // SAFE APPROACH: Use Page Bounds for Ink Annotation
+                     // This avoids complex coordinate transformations and clipping issues.
+                     // The path points are already in page coordinates.
+                     let pageBounds = page.bounds(for: .mediaBox)
+                     let annotation = PDFAnnotation(bounds: pageBounds, forType: .ink, withProperties: nil)
+                     
+                     let path = UIBezierPath()
+                     if let first = annotationPoints.first {
+                         path.move(to: first)
+                         for point in annotationPoints.dropFirst() {
+                             path.addLine(to: point)
+                         }
+                     }
+                     
+                     annotation.add(path)
+                     annotation.color = parent.activeAnnotationTool == .highlight ? color.withAlphaComponent(0.3) : color
+                     
+                     let border = PDFBorder()
+                     border.lineWidth = parent.activeAnnotationTool == .highlight ? 20 : 3
+                     border.style = .solid
+                     annotation.border = border
+                     
+                     page.addAnnotation(annotation)
+                     
+                 case .rectangle:
+                     let start = annotationPoints.first ?? .zero
+                     let end = annotationPoints.last ?? .zero
+                     let rect = CGRect(x: min(start.x, end.x),
+                                       y: min(start.y, end.y),
+                                       width: abs(end.x - start.x),
+                                       height: abs(end.y - start.y))
+                     
+                     let annotation = PDFAnnotation(bounds: rect, forType: .square, withProperties: nil)
+                     annotation.color = color
+                     annotation.border = PDFBorder()
+                     annotation.border?.lineWidth = 3
+                     page.addAnnotation(annotation)
+                     
+                 case .arrow:
+                     let start = annotationPoints.first ?? .zero
+                     let end = annotationPoints.last ?? .zero
+                     
+                     // SAFE APPROACH: Use Page Bounds for Arrow Annotation
+                     // This prevents clipping of the arrow head or line width if the bounds are too tight.
+                     let pageBounds = page.bounds(for: .mediaBox)
+                     let annotation = PDFAnnotation(bounds: pageBounds, forType: .line, withProperties: nil)
+                     
+                     annotation.startPoint = start
+                     annotation.endPoint = end
+                     annotation.startLineStyle = .none
+                     annotation.endLineStyle = .openArrow
+                     annotation.color = color
+                     
+                     let border = PDFBorder()
+                     border.lineWidth = 3
+                     annotation.border = border
+                     
+                     page.addAnnotation(annotation)
+                 }
+                 
+                 // Cleanup
+                 layer.removeFromSuperlayer()
+                 currentAnnotationLayer = nil
+                 currentAnnotationPath = nil
+                 annotationPoints = []
+                 
+                 // Force Redraw
+                 parent.pdfView.setNeedsDisplay()
+             default: break
+             }
+        }
+        
+        func handleSelectionPan(_ gesture: UIPanGestureRecognizer, location: CGPoint) {
             switch gesture.state {
             case .began:
                 clearSelection()

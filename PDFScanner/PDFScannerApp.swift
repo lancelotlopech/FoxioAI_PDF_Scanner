@@ -12,6 +12,12 @@ import AppTrackingTransparency
 struct PDFScannerApp: App {
     @StateObject private var store = FoxDocumentStore()
     @State private var isAppActive = false
+    @State private var showSubscriptionOnLaunch = false
+    
+    init() {
+        // Increment launch count on app start
+        RatingManager.shared.incrementLaunchCount()
+    }
     
     var body: some Scene {
         WindowGroup {
@@ -23,12 +29,34 @@ struct PDFScannerApp: App {
                         .transition(.opacity)
                         .onAppear {
                             requestTracking()
+                            checkSubscriptionStatus()
+                            
+                            // Try to show rating on launch (e.g. 3rd launch)
+                            // Delay to avoid conflict with subscription sheet
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                                RatingManager.shared.tryShowRating()
+                            }
+                        }
+                        .fullScreenCover(isPresented: $showSubscriptionOnLaunch) {
+                            SubscriptionView()
                         }
                 } else {
                     SplashView(isActive: $isAppActive)
                 }
             }
             .animation(.easeOut, value: isAppActive)
+        }
+    }
+    
+    private func checkSubscriptionStatus() {
+        // Delay slightly to ensure UI is ready
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            Task {
+                await SubscriptionManager.shared.updateSubscriptionStatus()
+                if !SubscriptionManager.shared.isPremium {
+                    showSubscriptionOnLaunch = true
+                }
+            }
         }
     }
     
