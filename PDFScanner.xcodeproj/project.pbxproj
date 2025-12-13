@@ -6,6 +6,14 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		1A415C392EEBF08A005D8BBD /* FacebookAEM in Frameworks */ = {isa = PBXBuildFile; productRef = 1A415C382EEBF08A005D8BBD /* FacebookAEM */; };
+		1A415C3B2EEBF08A005D8BBD /* FacebookBasics in Frameworks */ = {isa = PBXBuildFile; productRef = 1A415C3A2EEBF08A005D8BBD /* FacebookBasics */; };
+		1A415C3D2EEBF08A005D8BBD /* FacebookCore in Frameworks */ = {isa = PBXBuildFile; productRef = 1A415C3C2EEBF08A005D8BBD /* FacebookCore */; };
+		1A415C3F2EEBF08A005D8BBD /* FacebookShare in Frameworks */ = {isa = PBXBuildFile; productRef = 1A415C3E2EEBF08A005D8BBD /* FacebookShare */; };
+		1A5B04472EEC2B2900B4EC88 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 1A5B04462EEC2B2900B4EC88 /* FirebaseAnalytics */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		1A89761F2ED57D4100716323 /* PDFScanner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PDFScanner.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -36,16 +44,29 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1A415C392EEBF08A005D8BBD /* FacebookAEM in Frameworks */,
+				1A415C3D2EEBF08A005D8BBD /* FacebookCore in Frameworks */,
+				1A415C3F2EEBF08A005D8BBD /* FacebookShare in Frameworks */,
+				1A5B04472EEC2B2900B4EC88 /* FirebaseAnalytics in Frameworks */,
+				1A415C3B2EEBF08A005D8BBD /* FacebookBasics in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		1A5B04452EEC2B2900B4EC88 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		1A8976162ED57D4100716323 = {
 			isa = PBXGroup;
 			children = (
 				1A8976212ED57D4100716323 /* PDFScanner */,
+				1A5B04452EEC2B2900B4EC88 /* Frameworks */,
 				1A8976202ED57D4100716323 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -78,6 +99,11 @@
 			);
 			name = PDFScanner;
 			packageProductDependencies = (
+				1A415C382EEBF08A005D8BBD /* FacebookAEM */,
+				1A415C3A2EEBF08A005D8BBD /* FacebookBasics */,
+				1A415C3C2EEBF08A005D8BBD /* FacebookCore */,
+				1A415C3E2EEBF08A005D8BBD /* FacebookShare */,
+				1A5B04462EEC2B2900B4EC88 /* FirebaseAnalytics */,
 			);
 			productName = PDFScanner;
 			productReference = 1A89761F2ED57D4100716323 /* PDFScanner.app */;
@@ -111,6 +137,10 @@
 			);
 			mainGroup = 1A8976162ED57D4100716323;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				1A415C372EEBF08A005D8BBD /* XCRemoteSwiftPackageReference "facebook-ios-sdk" */,
+				1AF81E972EEC257700A3BD4F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 1A8976202ED57D4100716323 /* Products */;
 			projectDirPath = "";
@@ -271,7 +301,10 @@
 				INFOPLIST_FILE = PDFScanner/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "";
 				INFOPLIST_KEY_LSApplicationCategoryType = "";
-				INFOPLIST_KEY_NSCameraUsageDescription = "We need access to your camera to scan documents";
+				INFOPLIST_KEY_NSCameraUsageDescription = "We need camera access to scan documents.";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "We need permission to save exported images to your photo library.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "We need access to your photo library to import documents and images.";
+				INFOPLIST_KEY_NSUserTrackingUsageDescription = "This identifier will be used to deliver personalized ads to you.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -287,7 +320,7 @@
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 15.7;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = sign.PDFScanner;
+				PRODUCT_BUNDLE_IDENTIFIER = com.foxioAIpdf.scanner;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
@@ -318,7 +351,10 @@
 				INFOPLIST_FILE = PDFScanner/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "";
 				INFOPLIST_KEY_LSApplicationCategoryType = "";
-				INFOPLIST_KEY_NSCameraUsageDescription = "We need access to your camera to scan documents";
+				INFOPLIST_KEY_NSCameraUsageDescription = "We need camera access to scan documents.";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "We need permission to save exported images to your photo library.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "We need access to your photo library to import documents and images.";
+				INFOPLIST_KEY_NSUserTrackingUsageDescription = "This identifier will be used to deliver personalized ads to you.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -334,7 +370,7 @@
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 15.7;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = sign.PDFScanner;
+				PRODUCT_BUNDLE_IDENTIFIER = com.foxioAIpdf.scanner;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
@@ -372,6 +408,53 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		1A415C372EEBF08A005D8BBD /* XCRemoteSwiftPackageReference "facebook-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/facebook/facebook-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 14.1.0;
+			};
+		};
+		1AF81E972EEC257700A3BD4F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.7.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		1A415C382EEBF08A005D8BBD /* FacebookAEM */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1A415C372EEBF08A005D8BBD /* XCRemoteSwiftPackageReference "facebook-ios-sdk" */;
+			productName = FacebookAEM;
+		};
+		1A415C3A2EEBF08A005D8BBD /* FacebookBasics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1A415C372EEBF08A005D8BBD /* XCRemoteSwiftPackageReference "facebook-ios-sdk" */;
+			productName = FacebookBasics;
+		};
+		1A415C3C2EEBF08A005D8BBD /* FacebookCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1A415C372EEBF08A005D8BBD /* XCRemoteSwiftPackageReference "facebook-ios-sdk" */;
+			productName = FacebookCore;
+		};
+		1A415C3E2EEBF08A005D8BBD /* FacebookShare */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1A415C372EEBF08A005D8BBD /* XCRemoteSwiftPackageReference "facebook-ios-sdk" */;
+			productName = FacebookShare;
+		};
+		1A5B04462EEC2B2900B4EC88 /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1AF81E972EEC257700A3BD4F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 1A8976172ED57D4100716323 /* Project object */;
 }
