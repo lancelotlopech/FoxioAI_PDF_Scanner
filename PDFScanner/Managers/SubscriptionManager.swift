@@ -1,6 +1,7 @@
 import Foundation
 import StoreKit
 import Combine
+import FacebookCore
 
 // MARK: - Subscription Manager
 @MainActor
@@ -112,6 +113,10 @@ class SubscriptionManager: ObservableObject {
             
             // The transaction is valid. Update status.
             await updateSubscriptionStatus()
+            
+            // NOTE: Facebook Auto-Logging is enabled in PDFScannerApp.swift
+            // We do NOT manually log events here to avoid duplication.
+            // Facebook SDK will automatically capture StartTrial and Subscribe events from StoreKit.
             
             // Always finish a transaction.
             await transaction.finish()

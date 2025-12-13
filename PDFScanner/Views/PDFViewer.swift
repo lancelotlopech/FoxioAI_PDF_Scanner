@@ -187,19 +187,24 @@ struct FoxPDFViewer: View {
                 RatingManager.shared.tryShowRating()
             }
         }
-        .navigationTitle((isEditMode || isAnnotationMode) ? "" : item.name)
+        // Hide title to make room for toolbar icons
+        .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarHidden(isEditMode || isAnnotationMode)
         .toolbar {
             if !isEditMode && !isAnnotationMode {
-                ToolbarItem(placement: .primaryAction) {
-                    HStack {
+                // Use a single ToolbarItem with HStack to force linear layout
+                ToolbarItem(placement: .topBarTrailing) {
+                    HStack(spacing: 16) {
+                        // Annotate
                         Button {
                             isAnnotationMode = true
                         } label: {
-                            Label("Annotate", systemImage: "pencil.tip.crop.circle")
+                            Image(systemName: "pencil.tip.crop.circle")
+                                .font(.system(size: 18))
                         }
                         
+                        // OCR / Edit Text
                         Button {
                             if SubscriptionManager.shared.checkAccess(for: .ocr) {
                                 startScanningEffect()
@@ -208,19 +213,11 @@ struct FoxPDFViewer: View {
                                 showSubscription = true
                             }
                         } label: {
-                            Label("Edit Text", systemImage: "pencil.and.scribble")
+                            Image(systemName: "pencil.and.scribble")
+                                .font(.system(size: 18))
                         }
                         
-                        Button {
-                            if pdfDocument == nil, let url = item.url {
-                                pdfDocument = PDFDocument(url: url)
-                            }
-                            if pdfDocument == nil { pdfDocument = pdfView.document }
-                            isShowingPageEditor = true
-                        } label: {
-                            Label("Pages", systemImage: "square.grid.2x2")
-                        }
-                        
+                        // Sign
                         Button {
                             if SubscriptionManager.shared.checkAccess(for: .signature) {
                                 isShowingSignatureCanvas = true
@@ -229,32 +226,45 @@ struct FoxPDFViewer: View {
                                 showSubscription = true
                             }
                         } label: {
-                            Label("Sign", systemImage: "signature")
-                        }
-                    }
-                }
-                
-                ToolbarItem(placement: .topBarTrailing) {
-                    Menu {
-                        Button {
-                            isShowingExportOptions = true
-                        } label: {
-                            Label(String(localized: "Share PDF"), systemImage: "square.and.arrow.up")
+                            Image(systemName: "signature")
+                                .font(.system(size: 18))
                         }
                         
+                        // Pages Manager
                         Button {
-                            printPDF()
+                            if pdfDocument == nil, let url = item.url {
+                                pdfDocument = PDFDocument(url: url)
+                            }
+                            if pdfDocument == nil { pdfDocument = pdfView.document }
+                            isShowingPageEditor = true
                         } label: {
-                            Label(String(localized: "Print"), systemImage: "printer")
+                            Image(systemName: "square.grid.2x2")
+                                .font(.system(size: 18))
                         }
                         
-                        Button {
-                            saveToPhotos()
+                        // More Menu (Share/Print/Export) - Always last
+                        Menu {
+                            Button {
+                                isShowingExportOptions = true
+                            } label: {
+                                Label(String(localized: "Share PDF"), systemImage: "square.and.arrow.up")
+                            }
+                            
+                            Button {
+                                printPDF()
+                            } label: {
+                                Label(String(localized: "Print"), systemImage: "printer")
+                            }
+                            
+                            Button {
+                                saveToPhotos()
+                            } label: {
+                                Label(String(localized: "Export as Images"), systemImage: "photo")
+                            }
                         } label: {
-                            Label(String(localized: "Export as Images"), systemImage: "photo")
+                            Image(systemName: "ellipsis.circle")
+                                .font(.system(size: 18))
                         }
-                    } label: {
-                        Image(systemName: "ellipsis.circle")
                     }
                 }
             }

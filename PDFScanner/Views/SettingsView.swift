@@ -9,6 +9,12 @@ struct SettingsView: View {
     @State private var showDebugAlert = false
     @Environment(\.requestReview) var requestReview
     
+    private var appVersion: String {
+        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0"
+        let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1"
+        return "\(version) (\(build))"
+    }
+    
     var body: some View {
         ZStack {
             NavigationStack {
@@ -93,7 +99,7 @@ struct SettingsView: View {
                     HStack {
                         Text("Version")
                         Spacer()
-                        Text("1.0.0")
+                        Text(appVersion)
                             .foregroundStyle(.secondary)
                             .contentShape(Rectangle()) // Ensure tap area is large enough
                             .onTapGesture(count: 8) {

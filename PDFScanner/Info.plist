@@ -2,18 +2,34 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <key>NSCameraUsageDescription</key>
-    <string>We need camera access to scan documents.</string>
-    <key>NSPhotoLibraryAddUsageDescription</key>
-    <string>We need permission to save exported images to your photo library.</string>
-    <key>NSPhotoLibraryUsageDescription</key>
-    <string>We need access to your photo library to import documents and images.</string>
-    <key>NSUserTrackingUsageDescription</key>
-    <string>This identifier will be used to deliver personalized ads to you.</string>
-    <key>UILaunchScreen</key>
-    <dict>
-        <key>UIColorName</key>
-        <string>LaunchBackgroundColor</string>
-    </dict>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>fb1560769445063784</string>
+			</array>
+		</dict>
+	</array>
+	<key>FacebookAdvertiserIDCollectionEnabled</key>
+	<true/>
+	<key>FacebookAppID</key>
+	<string>1560769445063784</string>
+	<key>FacebookAutoLogAppEventsEnabled</key>
+	<true/>
+	<key>FacebookClientToken</key>
+	<string>f1b815b1e4dfc59bd3fb48c302b5b57f</string>
+	<key>FacebookDisplayName</key>
+	<string>Foxio AI PDF scanner</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>fbapi</string>
+		<string>fb-messenger-share-api</string>
+	</array>
+	<key>UILaunchScreen</key>
+	<dict>
+		<key>UIColorName</key>
+		<string>LaunchBackgroundColor</string>
+	</dict>
 </dict>
 </plist>

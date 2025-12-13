@@ -3,6 +3,7 @@ import PDFKit
 import UIKit
 import WebKit
 import CoreImage.CIFilterBuiltins
+import FacebookCore
 
 struct SecurityScanResult {
     let isSafe: Bool
@@ -40,6 +41,14 @@ class FoxPDFManager {
         
         do {
             try pdfData.write(to: fileURL, options: .atomic)
+            
+            // LOG TO FACEBOOK: Scan Completed
+            // This is a custom event to track core app usage
+            AppEvents.shared.logEvent(AppEvents.Name("ScanCompleted"), parameters: [
+                AppEvents.ParameterName.contentID: uniqueFilename,
+                AppEvents.ParameterName.description: "Scan from Images"
+            ])
+            
             return fileURL
         } catch {
             print("Error saving PDF: \(error)")
@@ -96,24 +105,23 @@ class FoxPDFManager {
             guard let context = UIGraphicsGetCurrentContext() else { continue }
             
             // 1. Draw Original Page (Top Section)
+            // The context is in UIKit coordinates (Top-Left 0,0).
+            // We want to draw the page content in the top area: (0, 0) to (visualWidth, visualHeight).
+            
             context.saveGState()
             
-            // CRITICAL FIX: Force Coordinate Flip
-            // We want to draw the page content in the top part: (0, 0) to (visualWidth, visualHeight)
-            // In our flipped coordinate system (Top-Left 0,0), this is naturally at the top.
+            // To draw a PDF page correctly, we need to flip the coordinate system LOCALLY
+            // because PDF content expects a Bottom-Left coordinate system (Y grows up).
             
-            // Flip Y axis to match UIKit coordinates (Top-Left 0,0)
-            // Note: We translate by totalHeight because that's the full page height now.
-            context.translateBy(x: 0.0, y: totalHeight)
+            // We want the visual bottom of the content to be at Y = visualHeight.
+            // So we translate to (0, visualHeight) and flip Y.
+            context.translateBy(x: 0.0, y: visualHeight)
             context.scaleBy(x: 1.0, y: -1.0)
             
-            // Now (0,0) is Top-Left.
-            // We want to draw the page content.
-            // Since we increased the page height, we need to decide where to put the content.
-            // We want it at the TOP.
-            // In Top-Left coords, Top is Y=0.
+            // Now we have a standard PDF coordinate system for the content area.
+            // Origin (0,0) is at the bottom-left of the content area.
             
-            // Handle rotation manually
+            // Handle rotation
             switch rotation {
             case 0:
                 context.translateBy(x: 0, y: 0)
@@ -134,41 +142,15 @@ class FoxPDFManager {
             context.restoreGState()
             
             // 2. Draw Watermark (Footer Section)
-            // We draw this in the standard PDF coordinate system (Bottom-Left 0,0)
-            // because we restored the GState.
-            // In PDF coords (Bottom-Left 0,0), the "Bottom" of our visual page is actually Y=0.
-            // Since we extended the height, the "Footer" is the bottom-most part, which is Y=0 to Y=footerHeight.
-            // The original content is above it, from Y=footerHeight to Y=totalHeight.
-            
-            // Wait, let's double check the flip logic above.
-            // We did: translate(0, totalHeight) then scale(1, -1).
-            // This maps PDF(0,0) [Bottom-Left] to UIKit(0, totalHeight) [Visual Bottom].
-            // And PDF(0, totalHeight) [Top-Left] to UIKit(0, 0) [Visual Top].
-            
-            // So if we draw the page at (0,0) in the flipped context, it appears at the Visual Top. Correct.
-            
-            // 2. Draw Watermark (Footer Section)
-            // We need to be careful about coordinates.
-            // We restored GState, so we are back to the PDF Context's default coordinate system.
-            // BUT, UIGraphicsBeginPDFPageWithInfo creates a context where (0,0) is Bottom-Left.
-            
-            // However, we observed that drawing at (0,0) resulted in the watermark being at the TOP.
-            // This implies that despite our manual flip for the page content, the context itself might
-            // be behaving differently than standard PDF coords, OR our understanding of "Visual Top" was inverted.
-            
-            // If (0,0) resulted in Top, then the coordinate system is likely Top-Left (0,0) by default in this context
-            // (which is standard for UIGraphics contexts, even PDF ones, on iOS).
-            // If so, Y increases downwards.
-            
-            // If (0,0) is Top, then to draw at the Bottom, we need Y = totalHeight - footerHeight.
+            // We are back in UIKit coordinates (Top-Left 0,0).
+            // The footer starts at Y = visualHeight.
             
             context.saveGState()
             
-            // Draw at the bottom
-            let footerY = totalHeight - footerHeight
+            let footerY = visualHeight
             let footerRect = CGRect(x: 0, y: footerY, width: visualWidth, height: footerHeight)
             
-            // White background for footer
+            // White background
             UIColor.white.setFill()
             context.fill(footerRect)
             

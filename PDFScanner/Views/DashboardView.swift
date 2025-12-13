@@ -2,6 +2,7 @@ import SwiftUI
 import PhotosUI
 import PDFKit
 import UniformTypeIdentifiers
+import FacebookCore
 
 enum ActiveTool: Identifiable {
     case importPhotos
@@ -906,6 +907,16 @@ struct DashboardView: View {
     private func processImages(_ images: [UIImage], source: String) {
         guard !images.isEmpty else { return }
         if let pdfURL = FoxPDFManager.shared.createPDF(from: images, filename: "Scan") {
+            // Log ScanCompleted Event (Daily Limit)
+            let lastScanDate = UserDefaults.standard.object(forKey: "LastScanEventDate") as? Date
+            if lastScanDate == nil || !Calendar.current.isDateInToday(lastScanDate!) {
+                FacebookCore.AppEvents.shared.logEvent(AppEvents.Name("ScanCompleted"), parameters: [
+                    AppEvents.ParameterName.description: source,
+                    AppEvents.ParameterName.numItems: images.count
+                ])
+                UserDefaults.standard.set(Date(), forKey: "LastScanEventDate")
+            }
+            
             let item = ScannedItem(name: pdfURL.deletingPathExtension().lastPathComponent, url: pdfURL, pageCount: images.count)
             store.addDocument(item)
             navigationPath.append(item)
